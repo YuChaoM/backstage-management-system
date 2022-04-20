@@ -1,5 +1,7 @@
 package com.yuchao.managementsystem.service;
 
+import com.yuchao.managementsystem.common.Result;
+import com.yuchao.managementsystem.controller.dto.UserDTO;
 import com.yuchao.managementsystem.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,4 +15,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IUserService extends IService<User> {
 
+    Result login(UserDTO user);
+
+    Result register(UserDTO userdto);
+
+    Result check(UserDTO userDTO);
 }

@@ -27,39 +27,41 @@ export default {
   name: "Login",
   data() {
     return {
-      user: {},
-      rules: {
+      user: {},//user对象发送到后台校验
+      rules: {//表单校验规则
         username: [
           {required: true, message: '请输入用户名', trigger: 'blur'},
           {min: 3, max: 10, message: '长度在 3 到 5 个字符', trigger: 'blur'}
         ],
         password: [
           {required: true, message: '请输入密码', trigger: 'blur'},
-          {min: 1, max: 20, message: '长度在 1 到 20 个字符', trigger: 'blur'}
+          {min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur'}
         ],
       }
     }
   },
   methods: {
     login() {
-      this.$refs['userForm'].validate((valid) => {
+      this.$refs['userForm'].validate((valid) => {//校验不合法时不会发请求
         if (valid) {  // 表单校验合法
           this.request.post("/user/login", this.user).then(res => {
+            console.log(res)
             if (res.code === '200') {
               localStorage.setItem("user", JSON.stringify(res.data))  // 存储用户信息到浏览器
               localStorage.setItem("menus", JSON.stringify(res.data.menus))  // 存储用户信息到浏览器
-              // 动态设置当前用户的路由
-              setRoutes()
+              // // 动态设置当前用户的路由
+              // setRoutes()
               this.$message.success("登录成功")
-
-              if (res.data.role === 'ROLE_STUDENT') {
-                this.$router.push("/front/home")
-              } else {
-                this.$router.push("/")
-              }
+              this.$router.push("/")
+              // if (res.data.role === 'ROLE_STUDENT') {
+              //   this.$router.push("/front/home")
+              // } else {
+              //   this.$router.push("/")
+              // }
             } else {
-              this.$message.error(res.msg)
+              this.$message.error(res.msg)//报后台返回的信息
             }
+
           })
         }
       });
@@ -70,8 +72,9 @@ export default {
 
 <style>
 .wrapper {
-  height: 100vh;
-  background-image: linear-gradient(to bottom right, #FC466B, #3F5EFB);
+  height: 100vh; /*撑满窗口*/
+  background-image: linear-gradient(to bottom right, #FC466B, #3F5EFB); /*渐变色*/
+  /*background-image: linear-gradient(-20deg, #d558c8 0%, #24d292 100%);*/
   overflow: hidden;
 }
 </style>
