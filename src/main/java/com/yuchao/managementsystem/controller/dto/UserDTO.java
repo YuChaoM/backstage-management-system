@@ -1,5 +1,7 @@
 package com.yuchao.managementsystem.controller.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 /**
@@ -10,7 +12,10 @@ import lombok.Data;
 @Data
 public class UserDTO {
     private String username;
+//    @JsonIgnore,开启后前台传过来的数据没拿到
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     private String nickname;
     private String avatarUrl;
+    private String token;
 }

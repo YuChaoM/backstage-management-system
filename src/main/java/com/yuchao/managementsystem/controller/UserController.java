@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yuchao.managementsystem.common.Constants;
 import com.yuchao.managementsystem.common.Result;
 import com.yuchao.managementsystem.controller.dto.UserDTO;
+import com.yuchao.managementsystem.utils.TokenUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -91,8 +92,8 @@ public class UserController {
                                @RequestParam(defaultValue = "") String email,
                                @RequestParam(defaultValue = "") String address) {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        //现在模糊查询就简单了,要给参数加一个默认值，不然的话，什么都不传，就会报错
-        if (!"".equals(username)) {//空的话会直接拼%%,查出的结果不对
+
+        if (!"".equals(username)) {//不判空的话会直接拼%%,不好
             userQueryWrapper.like("username", username);
         }
         if (!"".equals(email)) {
@@ -101,6 +102,9 @@ public class UserController {
         if (!"".equals(address)) {
             userQueryWrapper.like("address", address);
         }
+        //获取当前用户信息
+        User currentUser = TokenUtils.getCurrentUser();
+        System.out.println(currentUser.getUsername());
         return Result.success(userService.page(new Page<>(pageNum, pageSize), userQueryWrapper));
     }
 
