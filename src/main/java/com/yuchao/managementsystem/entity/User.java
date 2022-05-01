@@ -3,17 +3,14 @@ package com.yuchao.managementsystem.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -32,7 +29,7 @@ public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("ID")
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)//不写这个id自增就会很奇怪
     private Integer id;
 
     @ApiModelProperty("用户名")
@@ -55,10 +52,11 @@ public class User implements Serializable {
     private String address;
 
     @ApiModelProperty("创建时间	")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     @ApiModelProperty("头像")
     private String avatarUrl;
 
-
+    @ApiModelProperty("角色")
+    private String role;
 }

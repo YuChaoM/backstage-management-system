@@ -22,6 +22,9 @@
         <el-dropdown-item style="font-size: 14px; padding: 5px 0">
           <router-link to="/person" style="text-decoration: none">个人信息</router-link>
         </el-dropdown-item>
+        <el-dropdown-item style="font-size: 14px; padding: 5px 0">
+          <router-link to="/password" style="text-decoration: none">修改密码</router-link>
+        </el-dropdown-item>
         <el-dropdown-item style="font-size: 14px; padding: 10px 0">
           <span style="text-decoration: none" @click="logout">退出</span>
         </el-dropdown-item>
@@ -36,11 +39,12 @@ import user from "../views/User";
 
 export default {
   name: "Header",
-  props: {
+  props: {//定义的变量用来接受manage传过来的数据
     collapseBtnClass: String,
+    user: Object,
   },
   computed: {
-    currentPathName() {
+    currentPathName() {//页签功能
       let msg = this.$store.state.currentPathName//需要监听的数据
       if (msg == "首页") {
         return
@@ -52,18 +56,21 @@ export default {
   },
   data() {
     return {
-      user: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {}
+      //user已经传过来了，不需要在获取了
+      // user: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {}
     }
   },
-  inject: ["fatherMethod"],
+  inject: ["fatherMethod"],//注入进来
   methods: {
     collapse() {
       this.$emit("asideCollapse")
       this.fatherMethod();
     },
     logout() {
-      this.$router.push("/login")
-      localStorage.removeItem("user")//退出后删除信息
+      // this.$router.push("/login")
+      // localStorage.removeItem("user")//退出后删除信息
+      // localStorage.removeItem("menus")//退出后删除信息
+      this.$store.commit("logout")
       this.$message.success("退出成功")
     }
   }

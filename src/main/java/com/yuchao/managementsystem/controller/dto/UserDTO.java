@@ -1,8 +1,10 @@
 package com.yuchao.managementsystem.controller.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.yuchao.managementsystem.entity.Menu;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @author 蒙宇潮
@@ -18,4 +20,6 @@ public class UserDTO {
     private String nickname;
     private String avatarUrl;
     private String token;
+    private String role;
+    private List<Menu> menus;
 }

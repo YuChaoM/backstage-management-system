@@ -1,16 +1,19 @@
 package com.yuchao.managementsystem.controller;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.yuchao.managementsystem.common.Constants;
 import com.yuchao.managementsystem.common.Result;
 import com.yuchao.managementsystem.controller.dto.UserDTO;
+import com.yuchao.managementsystem.controller.dto.UserPasswordDTO;
+import com.yuchao.managementsystem.entity.User;
+import com.yuchao.managementsystem.service.IUserService;
 import com.yuchao.managementsystem.utils.TokenUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
@@ -18,14 +21,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.List;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-
-import com.yuchao.managementsystem.service.IUserService;
-import com.yuchao.managementsystem.entity.User;
-
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * <p>
@@ -53,6 +48,11 @@ public class UserController {
     @PostMapping("check")
     public Result check(@RequestBody UserDTO userDTO){
         return userService.check(userDTO);
+    }
+    @PostMapping("/password")
+    public Result updatePassword(@RequestBody UserPasswordDTO userPasswordDTO) {
+        userService.updatePassword(userPasswordDTO);
+        return Result.success();
     }
 
     // 新增或者更新

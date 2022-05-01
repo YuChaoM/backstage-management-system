@@ -1,9 +1,6 @@
 <template>
   <el-card style="width: 500px;margin: auto">
     <el-form label-width="80px" size="small">
-<!--      <el-form-item label="用户名">-->
-<!--        <el-input v-model="form.username" autocomplete="off"></el-input>-->
-<!--      </el-form-item>-->
       <el-upload
           class="avatar-uploader"
           action="http://localhost:9090/file/upload"
@@ -13,6 +10,9 @@
         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
       </el-upload>
 
+      <el-form-item label="用户名" >
+        <el-input v-model="form.username" disabled autocomplete="off"></el-input>
+      </el-form-item>
       <el-form-item label="昵称">
         <el-input v-model="form.nickname" autocomplete="off"></el-input>
       </el-form-item>
@@ -23,7 +23,7 @@
         <el-input v-model="form.phone" autocomplete="off"></el-input>
       </el-form-item>
       <el-form-item label="地址">
-        <el-input v-model="form.address" autocomplete="off"></el-input>
+        <el-input type="textarea" v-model="form.address" autocomplete="off"></el-input>
       </el-form-item>
       <el-form-item >
         <el-button type="primary" @click="save()">确 定</el-button>
@@ -41,7 +41,7 @@ export default {
   data(){
     return{
       form:{},
-      //当前登录用户浏览器保存的用户信息，不全
+      // //当前登录用户浏览器保存的用户信息，返回的是dto
       user:localStorage.getItem("user")?JSON.parse(localStorage.getItem("user")):{},
     }
   },
@@ -61,6 +61,9 @@ export default {
         console.log(res)
         if (res.code === '200') {
           this.$message.success("保存成功")
+
+          //触发父级更新user的方法,子(person)传父(manage)在父传子(header)
+          this.$emit("refreshUser")
           this.getUser().then(res =>{//更新头像后，重新在数据库获取user
             res.token = JSON.parse(localStorage.getItem("user")).token
             localStorage.setItem("user",JSON.stringify(res))//重新存到浏览器

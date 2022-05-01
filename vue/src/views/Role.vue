@@ -5,11 +5,7 @@
       <el-col :span="16">
         <div style="margin: 10px 0;">
           <el-input class="ml-5" style="width: 200px" placeholder="请输入名称" suffix-icon="el-icon-search"
-                    v-model="username"></el-input>
-          <el-input class="ml-5" style="width: 200px" placeholder="请输入邮箱" suffix-icon="el-icon-message"
-                    v-model="email"></el-input>
-          <el-input class="ml-5" style="width: 200px" placeholder="请输入地址" suffix-icon="el-icon-position"
-                    v-model="address"></el-input>
+                    v-model="name"></el-input>
           <el-button class="ml-5" type="primary" @click="load">搜索</el-button>
           <el-button type="warning" @click="reset">重置</el-button>
         </div>
@@ -28,10 +24,6 @@
           >
             <el-button class="ml-5" type="danger" slot="reference">批量删除<i class="el-icon-remove"/></el-button>
           </el-popconfirm>
-          <el-upload action="http://localhost:9090/user/import" :show-file-list="false" accept="xlsx" :on-success="handelExcelImportSuccess" style="display: inline-block">
-            <el-button class="ml-5" type="primary" >导入<i class="el-icon-bottom"/></el-button>
-          </el-upload>
-          <el-button class="ml-5" type="primary" @click="exp">导出<i class="el-icon-top"/></el-button>
         </div>
       </el-col>
     </el-row>
@@ -42,17 +34,14 @@
       >
       <el-table-column type="selection" width="55"></el-table-column>
       <!--只要 prop值和字段一样，就会自动渲染 -->
-      <el-table-column prop="id" label="ID" width="80" sortable>
-      </el-table-column>
-      <el-table-column prop="username" label="姓名" width="140" sortable></el-table-column>
-      <el-table-column prop="nickname" label="昵称" width="120" sortable></el-table-column>
-      <el-table-column prop="role" label="角色" width="120" sortable></el-table-column>
-      <el-table-column prop="email" label="邮箱" sortable></el-table-column>
-      <el-table-column prop="phone" label="电话" sortable></el-table-column>
-      <el-table-column prop="address" label="地址" sortable></el-table-column>
+      <el-table-column prop="id" label="ID" width="80" sortable></el-table-column>
+      <el-table-column prop="name" label="名称" sortable></el-table-column>
+      <el-table-column prop="flag" label="唯一标识" sortable></el-table-column>
+      <el-table-column prop="description" label="描述" sortable></el-table-column>
 
-      <el-table-column label="操作" width="200" align="center">
+      <el-table-column label="操作" width="300" align="center">
         <template slot-scope="scope">
+          <el-button type="info" @click="selectMenu(scope.row)">分配菜单<i class="el-icon-menu"/></el-button>
           <el-button type="success" @click="handleEdit(scope.row)">编辑<i class="el-icon-edit"/></el-button>
           <el-popconfirm
               class="ml-5"
@@ -86,27 +75,16 @@
 
 
     <!--添加功能弹窗start-->
-    <el-dialog title="用户信息" :visible.sync="dialogFormVisible" width="30%">
+    <el-dialog title="角色信息" :visible.sync="dialogFormVisible" width="30%">
       <el-form label-width="80px" size="small">
-        <el-form-item label="用户名">
-          <el-input v-model="form.username" autocomplete="off"></el-input>
+        <el-form-item label="名称">
+          <el-input v-model="form.name" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="角色">
-          <el-select clearable v-model="form.role" placeholder="请选择角色" style="width: 100%">
-            <el-option v-for="item in roles" :key="item.name" :label="item.name" :value="item.flag"></el-option>
-          </el-select>
+        <el-form-item label="唯一标识">
+          <el-input v-model="form.flag" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="昵称">
-          <el-input v-model="form.nickname" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="邮箱">
-          <el-input v-model="form.email" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="电话">
-          <el-input v-model="form.phone" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="地址">
-          <el-input v-model="form.address" autocomplete="off"></el-input>
+        <el-form-item label="描述">
+          <el-input v-model="form.description" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -115,6 +93,28 @@
       </div>
     </el-dialog>
     <!--添加功能弹窗start-->
+
+    <!-- 分配菜单功能弹窗start-->
+    <el-dialog title="菜单分配" :visible.sync="menuDialogVis" width="30%">
+      <el-tree
+          :props="props"
+          :data="menuData"
+          show-checkbox
+          node-key="id"
+          ref="tree"
+          :default-expanded-keys="expends"
+          :default-checked-keys="checks"
+          @check-change="handleCheckChange">
+          <span class="custom-tree-node" slot-scope="{ node, data }">
+            <span><i :class="data.icon"/> {{ data.name }}</span>
+          </span>
+      </el-tree>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="menuDialogVis = false">取 消</el-button>
+        <el-button type="primary" @click="saveRoleMenu">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!-- 分配菜单功能弹窗end-->
   </div>
 </template>
 
@@ -127,15 +127,21 @@ export default {
       total: 0,//后台传过来的，然后和上面绑定
       pageNum: 1,//前端页面传过来的
       pageSize: 5,//默认每页两条
-      username: "",
-      email: "",
-      address: "",
+      name: "",
       form: {},
       isinsert: true,//默认是新增
       multipleSelection: [],
       dialogFormVisible: false,
+      menuDialogVis: false,
       headerBg: 'headerBg', //表头背景颜色
-      roles:[],
+      menuData: [],
+      props: {
+        label: 'name',//怎么渲染的呢
+      },
+      expends: [],
+      checks: [],
+      roleId: 0,//给谁分配
+      roleFlag: ''
     }
   },
   created() {
@@ -146,13 +152,11 @@ export default {
     load() {
       // request.get("http://localhost:9090/user/page?pageNum=" + this.pageNum + "&pageSize=" + this.pageSize +
       //     "&username=" + this.username + "&email=" + this.email + "&address=" + this.address).then(res => {
-      this.request.get("/user/page", {
+      this.request.get("/role/page", {
             params: {//请求参数
               pageNum: this.pageNum,
               pageSize: this.pageSize,
-              username: this.username,
-              email: this.email,
-              address: this.address
+              name: this.name,
             }
           }
       ).then(res => {
@@ -160,14 +164,10 @@ export default {
         this.tableData = res.data.records
         this.total = res.data.total
       })
-
-      this.request.get("/role").then(res =>{
-        this.roles = res.data
-      })
     },
     save() {
       //.then()就是后台返回的结果 ，url在request.js添加了前缀
-      this.request.post("/user", this.form).then(res => {
+      this.request.post("/role", this.form).then(res => {
         console.log(res)
         if (res.code === '200') {
           this.$message.success("保存成功")
@@ -189,13 +189,28 @@ export default {
         }
       })
     },
+    saveRoleMenu() {
+      console.log(this.$refs.tree.getCheckedKeys())
+      this.request.post("/role/roleMenu/" + this.roleId, this.$refs.tree.getCheckedKeys()).then(res => {
+        if (res.code === '200') {
+          this.$message.success('绑定成功')
+          this.menuDialogVis = false
+          if (this.roleFlag == 'ROLE_ADMIN') {
+            this.$store.commit("logout")//操作管理员角色时需要退出重新登录,调用logout
+          }
+        } else {
+          this.$message.error(res.msg)
+        }
+
+      })
+    },
     handleEdit(row) {
       this.form = row//把表格的数据赋予到弹窗里面
       this.dialogFormVisible = true//打开弹窗
       this.isinsert = false
     },
     del(id) {
-      this.request.delete("/user/" + id).then(res => {
+      this.request.delete("/role/" + id).then(res => {
         if (res.code === '200') {
           this.$message.success("删除成功")
           // 为了在删除最后一页的最后一条数据时能成功跳转回最后一页的上一页
@@ -210,8 +225,7 @@ export default {
     },
     delBatch() {
       let ids = this.multipleSelection.map(v => v.id)//把对象的数组边为纯id的数组[{},{}]=>[1,2]
-      this.request.post("/user/del/batch", ids).then(res => {
-        // if (res.data) {后台返回的是boolean
+      this.request.post("/role/del/batch", ids).then(res => {
         if (res.code === '200') {
           this.$message.success("批量删除成功")
           const totalPage = Math.ceil((this.total - this.multipleSelection.length) / this.pageSize)
@@ -240,22 +254,44 @@ export default {
       this.load()
     },
     reset() {
-      this.username = ""
-      this.email = ""
-      this.address = ""
+      this.name = ""
       this.load()
     },
     handleadd() {
       this.dialogFormVisible = true//弹窗打开
       this.form = {}
     },
-    exp() {
-      window.open("http://localhost:9090/user/export")
+    selectMenu(role) {
+      this.menuDialogVis = true
+      this.roleId = role.id
+      this.roleFlag = role.flag
+      //请求菜单数据，用于渲染选择框
+      this.request.get("/menu").then(res => {
+        console.log(res)
+        this.menuData = res.data
+        this.expends = this.menuData.map(v => v.id)//处理成id的数组
+
+      })
+      //查询已经分配的菜单
+      this.request.get("/role/roleMenu/" + role.id).then(res => {
+        console.log(res)
+        this.checks = res.data//返回的数list,设置了父级菜单的勾选，所有都选上了，这个不生效，下面解决
+
+        this.request.get("/menu/ids").then(r => {
+          const ids = r.data
+          ids.forEach(id => {
+            if (!this.checks.includes(id)) {
+              this.$refs.tree.setChecked(id, false)//checks没有的就不选中
+            }
+          })
+        })
+      })
+      this.menuDialogVis = true
     },
-    handelExcelImportSuccess(){
-      this.$message.success("导入成功")
-      this.load()
-    }
+
+    handleCheckChange(data, checked, indeterminate) {
+      console.log(data, checked, indeterminate);
+    },
   }
 }
 </script>

@@ -39,7 +39,7 @@ request.interceptors.response.use(
                 message: res.msg,
                 type: 'error'
             });
-
+            // router.push("/login")
             this.$router.push({
                 path: `/user/login`,
             })

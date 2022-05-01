@@ -47,12 +47,12 @@ export default {
           this.request.post("/user/login", this.user).then(res => {
             console.log(res)
             if (res.code === '200') {
-              localStorage.setItem("user", JSON.stringify(res.data))  // 存储用户信息到浏览器
-              localStorage.setItem("menus", JSON.stringify(res.data.menus))  // 存储用户信息到浏览器
+              localStorage.setItem("user", JSON.stringify(res.data))  // 存储用户信息到浏览器,包含token
+              localStorage.setItem("menus", JSON.stringify(res.data.menus))  // 存储用户菜单信息到浏览器，只有登录的接口才会处理菜单信息
               // // 动态设置当前用户的路由
-              // setRoutes()
-              this.$message.success("登录成功")
+              setRoutes()
               this.$router.push("/")
+              this.$message.success("登录成功")
               // if (res.data.role === 'ROLE_STUDENT') {
               //   this.$router.push("/front/home")
               // } else {
