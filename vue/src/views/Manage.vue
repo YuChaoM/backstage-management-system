@@ -70,7 +70,7 @@ export default {
       let username = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).username : ""
       this.request.get("user/username/" + username).then(res => {
         this.user = res.data//把最新的user传给header，不是浏览器缓存的了
-        console.log(res)
+        // console.log(res)
       })
     }
   }

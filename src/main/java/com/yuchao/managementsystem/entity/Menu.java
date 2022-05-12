@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -15,7 +16,7 @@ import lombok.Setter;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author yuchao
@@ -26,26 +27,27 @@ import lombok.Setter;
 @ApiModel(value = "Menu对象", description = "")
 public class Menu {
 
-      @ApiModelProperty("id")
-      @TableId(value = "id", type = IdType.AUTO)
-      private Integer id;
+    @ApiModelProperty("id")
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
 
-      @ApiModelProperty("名称")
-      private String name;
+    @ApiModelProperty("名称")
+    private String name;
 
-      @ApiModelProperty("路径")
-      private String path;
+    @ApiModelProperty("路径")
+    private String path;
 
-      @ApiModelProperty("图标")
-      private String icon;
+    @ApiModelProperty("图标")
+    private String icon;
 
-      @ApiModelProperty("描述")
-      private String description;
+    @ApiModelProperty("描述")
+    private String description;
 
-      @TableField(exist = false)//说明在类里面有，数据库表没有
-      private List<Menu> children;
+    @TableField(exist = false)//说明在类里面有，数据库表没有
+    private List<Menu> children;
 
-      private Integer pid;
+    private Integer pid;
 
-      private String pagePath;
+    private String pagePath;
+    private Integer sortNum;
 }

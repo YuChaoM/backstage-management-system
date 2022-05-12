@@ -48,7 +48,7 @@
         <template slot-scope="scope"><i :class="scope.row.icon" /> </template>
       </el-table-column>
       <el-table-column prop="description" label="描述" sortable></el-table-column>
-
+      <el-table-column prop="sortNum" label="顺序"></el-table-column>
       <el-table-column label="操作" width="300" align="center">
         <template slot-scope="scope">
           <el-button type="primary" @click="handleadd(scope.row.id)" v-if="!scope.row.pid && !scope.row.path">新增子菜单<i class="el-icon-plus"/></el-button>
@@ -93,6 +93,9 @@
             <i :class="item.value"/>{{item.name}}
             </el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item label="顺序">
+          <el-input v-model="form.sortNum" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="描述">
           <el-input v-model="form.description" autocomplete="off"></el-input>

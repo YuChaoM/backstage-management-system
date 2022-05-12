@@ -7,6 +7,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.yuchao.managementsystem.common.Constants;
+import com.yuchao.managementsystem.config.AuthAccess;
 import com.yuchao.managementsystem.entity.User;
 import com.yuchao.managementsystem.exception.ServiceException;
 import com.yuchao.managementsystem.service.IUserService;
@@ -26,7 +27,7 @@ import javax.servlet.http.HttpSession;
  * @create 2022-04-21  20:19
  */
 @Slf4j
-public class LoginInterceptor implements HandlerInterceptor{
+public class LoginInterceptor implements HandlerInterceptor {
     /**
      * 目标方法执行之前
      */
@@ -39,8 +40,14 @@ public class LoginInterceptor implements HandlerInterceptor{
         String token = request.getHeader("token");
         log.info(token);
         // 如果不是映射到方法直接通过
-        if(!(handler instanceof HandlerMethod)){
+        if (!(handler instanceof HandlerMethod)) {
             return true;//放行
+        } else {
+            HandlerMethod h = (HandlerMethod) handler;
+            AuthAccess authAccess = h.getMethodAnnotation(AuthAccess.class);
+            if (authAccess != null) {
+                return true;
+            }
         }
         // 执行认证
         if (StrUtil.isBlank(token) || "undefined".equals(token)) {

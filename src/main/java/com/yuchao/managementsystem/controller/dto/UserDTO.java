@@ -13,6 +13,8 @@ import java.util.List;
  */
 @Data
 public class UserDTO {
+
+    private Integer id;
     private String username;
 //    @JsonIgnore,开启后前台传过来的数据没拿到
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

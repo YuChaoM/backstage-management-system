@@ -6,8 +6,8 @@
         <div style="margin: 10px 0;">
           <el-input class="ml-5" style="width: 200px" placeholder="请输入名称" suffix-icon="el-icon-search"
                     v-model="username"></el-input>
-          <el-input class="ml-5" style="width: 200px" placeholder="请输入邮箱" suffix-icon="el-icon-message"
-                    v-model="email"></el-input>
+          <el-input class="ml-5" style="width: 200px" placeholder="请输入角色" suffix-icon="el-icon-message"
+                    v-model="role"></el-input>
           <el-input class="ml-5" style="width: 200px" placeholder="请输入地址" suffix-icon="el-icon-position"
                     v-model="address"></el-input>
           <el-button class="ml-5" type="primary" @click="load">搜索</el-button>
@@ -28,8 +28,9 @@
           >
             <el-button class="ml-5" type="danger" slot="reference">批量删除<i class="el-icon-remove"/></el-button>
           </el-popconfirm>
-          <el-upload action="http://localhost:9090/user/import" :show-file-list="false" accept="xlsx" :on-success="handelExcelImportSuccess" style="display: inline-block">
-            <el-button class="ml-5" type="primary" >导入<i class="el-icon-bottom"/></el-button>
+          <el-upload action="http://localhost:9090/user/import" :show-file-list="false" accept="xlsx"
+                     :on-success="handelExcelImportSuccess" style="display: inline-block">
+            <el-button class="ml-5" type="primary">导入<i class="el-icon-bottom"/></el-button>
           </el-upload>
           <el-button class="ml-5" type="primary" @click="exp">导出<i class="el-icon-top"/></el-button>
         </div>
@@ -45,14 +46,26 @@
       <el-table-column prop="id" label="ID" width="80" sortable>
       </el-table-column>
       <el-table-column prop="username" label="姓名" width="140" sortable></el-table-column>
-      <el-table-column prop="nickname" label="昵称" width="120" sortable></el-table-column>
-      <el-table-column prop="role" label="角色" width="120" sortable></el-table-column>
+      <el-table-column prop="nickname" label="昵称" width="100" sortable></el-table-column>
+      <el-table-column prop="role" label="角色" width="120" sortable>
+        <template slot-scope="scope">
+          <el-tag type="success" v-if="scope.row.role === 'ROLE_ADMIN'">管理员</el-tag>
+          <el-tag type="warning" v-if="scope.row.role === 'ROLE_TEACHER'">老师</el-tag>
+          <el-tag type="primary" v-if="scope.row.role === 'ROLE_STUDENT'">学生</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column prop="email" label="邮箱" sortable></el-table-column>
       <el-table-column prop="phone" label="电话" sortable></el-table-column>
       <el-table-column prop="address" label="地址" sortable></el-table-column>
 
-      <el-table-column label="操作" width="200" align="center">
+      <el-table-column label="操作" width="300" align="center">
         <template slot-scope="scope">
+          <el-button type="primary" @click="viewCourse(scope.row.courses)"
+                     v-if="scope.row.role === 'ROLE_TEACHER'|| scope.row.role === 'ROLE_ADMIN'">查看教授课程<i
+              class="el-icon-document"/></el-button>
+          <el-button type="primary" @click="viewStuCourse(scope.row.stuCourses)"
+                     v-if="scope.row.role === 'ROLE_STUDENT'">查看已选课程<i
+              class="el-icon-document"/></el-button>
           <el-button type="success" @click="handleEdit(scope.row)">编辑<i class="el-icon-edit"/></el-button>
           <el-popconfirm
               class="ml-5"
@@ -76,7 +89,7 @@
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           :current-page="pageNum"
-          :page-sizes="[5, 10, 15, 20]"
+          :page-sizes="[10, 15, 20,50]"
           :page-size="pageSize"
           layout="total, sizes, prev, pager, next, jumper"
           :total="total">
@@ -90,6 +103,9 @@
       <el-form label-width="80px" size="small">
         <el-form-item label="用户名">
           <el-input v-model="form.username" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="密码">
+          <el-input v-model="form.password" autocomplete="off" show-password></el-input>
         </el-form-item>
         <el-form-item label="角色">
           <el-select clearable v-model="form.role" placeholder="请选择角色" style="width: 100%">
@@ -115,6 +131,21 @@
       </div>
     </el-dialog>
     <!--添加功能弹窗start-->
+
+    <el-dialog title="课程信息" :visible.sync="visit" width="30%">
+      <el-table :data="courses">
+        <el-table-column prop="name" label="课程名称"></el-table-column>
+        <el-table-column prop="credit" label="学分"></el-table-column>
+      </el-table>
+    </el-dialog>
+
+    <el-dialog title="课程信息" :visible.sync="stuVisit" width="30%">
+      <el-table :data="stuCourses">
+        <el-table-column prop="name" label="课程名称"></el-table-column>
+        <el-table-column prop="credit" label="学分"></el-table-column>
+      </el-table>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -126,7 +157,7 @@ export default {
       tableData: [],
       total: 0,//后台传过来的，然后和上面绑定
       pageNum: 1,//前端页面传过来的
-      pageSize: 5,//默认每页两条
+      pageSize: 10,//默认每页两条
       username: "",
       email: "",
       address: "",
@@ -135,7 +166,13 @@ export default {
       multipleSelection: [],
       dialogFormVisible: false,
       headerBg: 'headerBg', //表头背景颜色
-      roles:[],
+      roles: [],
+      role: "",
+      flag: true,
+      courses: [],
+      stuCourses:[],
+      visit: false,
+      stuVisit:false,
     }
   },
   created() {
@@ -143,6 +180,14 @@ export default {
     this.load()
   },
   methods: {
+    viewCourse(courses) {
+      this.courses = courses
+      this.visit = true
+    },
+    viewStuCourse(stuCourses){
+      this.stuCourses = stuCourses
+      this.stuVisit = true
+    },
     load() {
       // request.get("http://localhost:9090/user/page?pageNum=" + this.pageNum + "&pageSize=" + this.pageSize +
       //     "&username=" + this.username + "&email=" + this.email + "&address=" + this.address).then(res => {
@@ -151,7 +196,7 @@ export default {
               pageNum: this.pageNum,
               pageSize: this.pageSize,
               username: this.username,
-              email: this.email,
+              role: this.role,
               address: this.address
             }
           }
@@ -161,7 +206,7 @@ export default {
         this.total = res.data.total
       })
 
-      this.request.get("/role").then(res =>{
+      this.request.get("/role").then(res => {
         this.roles = res.data
       })
     },
@@ -169,6 +214,7 @@ export default {
       //.then()就是后台返回的结果 ，url在request.js添加了前缀
       this.request.post("/user", this.form).then(res => {
         console.log(res)
+
         if (res.code === '200') {
           this.$message.success("保存成功")
           this.dialogFormVisible = false//关闭弹窗
@@ -185,9 +231,11 @@ export default {
             console.log(this.pageNum)
           }
         } else {
-          this.$message.error("失败")
+          this.$message.error(res.msg)
         }
       })
+      // }
+
     },
     handleEdit(row) {
       this.form = row//把表格的数据赋予到弹窗里面
@@ -195,7 +243,7 @@ export default {
       this.isinsert = false
     },
     del(id) {
-      this.request.delete("/user/" + id).then(res => {
+      this.request.delete("/user" + id).then(res => {
         if (res.code === '200') {
           this.$message.success("删除成功")
           // 为了在删除最后一页的最后一条数据时能成功跳转回最后一页的上一页
@@ -252,7 +300,7 @@ export default {
     exp() {
       window.open("http://localhost:9090/user/export")
     },
-    handelExcelImportSuccess(){
+    handelExcelImportSuccess() {
       this.$message.success("导入成功")
       this.load()
     }

@@ -1,6 +1,7 @@
 package com.yuchao.managementsystem.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -11,6 +12,7 @@ import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
@@ -35,8 +37,8 @@ public class User implements Serializable {
     @ApiModelProperty("用户名")
     private String username;
 
-    @JsonIgnore
-//    @ApiModelProperty("密码")
+    //    @JsonIgnore 读写都会被忽略
+    @ApiModelProperty("密码")
     private String password;
 
     @ApiModelProperty("昵称")
@@ -59,4 +61,10 @@ public class User implements Serializable {
 
     @ApiModelProperty("角色")
     private String role;
+
+    @TableField(exist = false)
+    private List<Course> courses;
+
+    @TableField(exist = false)
+    private List<Course> stuCourses;
 }

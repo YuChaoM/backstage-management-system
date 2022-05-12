@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuchao.managementsystem.mapper.CourseMapper">
+
+    <delete id="deleteStudentCourse">
+        delete from student_course where student_id = #{studentId} and course_id = #{courseId}
+    </delete>
+    <insert id="setStudentCourse">
+        insert into student_course(student_id, course_id)
+        values ( #{studentId}, #{courseId})
+    </insert>
+
+    <!-- 连接查询所有老师的所有课程 可以筛选出某个老师的课程-->
+    <select id="findPage" resultType="com.yuchao.managementsystem.entity.Course">
+        select course.* ,sys_user.nickname as teacher from course
+        left join sys_user
+        on course.teacher_id = sys_user.id
+        <where>
+            <if test="name != null and name != ''">
+                and name like concat('%',#{name},'%')
+            </if>
+            <if test="credit != 0">
+                and credit = #{credit}
+            </if>
+            <if test="attributes != null and attributes != ''">
+                and attributes like concat('%',#{attributes},'%')
+            </if>
+            <if test="id != 0">
+                and teacher_id = #{id}
+            </if>
+        </where>
+    </select>
+
+<!--    查询学生已选的课程-->
+    <select id="findStudentCourse" resultType="com.yuchao.managementsystem.entity.Course">
+        select course.*,sys_user.nickname as teacher from student_course
+        left join course
+        on student_course.course_id = course.id
+        left join  sys_user
+        on course.teacher_id = sys_user.id
+        <where>
+            <if test="name != null and name != ''">
+                and name like concat('%',#{name},'%')
+            </if>
+            <if test="credit != 0">
+                and credit = #{credit}
+            </if>
+            <if test="attributes != null and attributes != ''">
+                and attributes like concat('%',#{attributes},'%')
+            </if>
+            <if test="id != 0">
+                and student_id = #{id}
+            </if>
+        </where>
+    </select>
+
+
+
+</mapper>

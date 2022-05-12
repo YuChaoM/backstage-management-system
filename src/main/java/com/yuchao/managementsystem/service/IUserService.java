@@ -1,5 +1,6 @@
 package com.yuchao.managementsystem.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yuchao.managementsystem.common.Result;
 import com.yuchao.managementsystem.controller.dto.UserDTO;
 import com.yuchao.managementsystem.controller.dto.UserPasswordDTO;
@@ -23,4 +24,8 @@ public interface IUserService extends IService<User> {
     Result check(UserDTO userDTO);
 
     void updatePassword(UserPasswordDTO userPasswordDTO);
+
+    Result mysaveOrUpdate(User user);
+
+    Page<User>  findPage(Page<User> objectPage, String username, String role, String address);
 }

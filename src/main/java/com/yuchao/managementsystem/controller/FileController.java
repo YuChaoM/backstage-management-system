@@ -1,15 +1,21 @@
 package com.yuchao.managementsystem.controller;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.yuchao.managementsystem.common.Constants;
 import com.yuchao.managementsystem.common.Result;
 import com.yuchao.managementsystem.entity.Files;
 import com.yuchao.managementsystem.mapper.FileMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,6 +44,10 @@ public class FileController {
 //    @Autowired 时spring的注解，因为mapper没有显示的注入bean
     private FileMapper fileMapper;
 
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+
+
     /**
      * MultipartFile 自动封装上传过来的文件
      * maximum permitted size of 1048576 bytes
@@ -58,7 +68,7 @@ public class FileController {
             File uploadFile = new File(fileUploadPath + fileUUID);
             // 判断配置的文件目录是否存在，若不存在则创建一个新的文件目录
             File parentFile = uploadFile.getParentFile();
-            if(!parentFile.exists()) {
+            if (!parentFile.exists()) {
                 parentFile.mkdirs();
             }
 
@@ -83,6 +93,20 @@ public class FileController {
             saveFile.setUrl(url);
             saveFile.setMd5(md5);
             fileMapper.insert(saveFile);
+
+            //方式1从redis获取数据
+            String json = stringRedisTemplate.opsForValue().get(Constants.FILES_KEY);
+            List<Files> files1 = JSONUtil.toBean(json, new TypeReference<List<Files>>() {
+            }, true);
+            files1.add(saveFile);//加入新上传的到redis
+            setCache(Constants.FILES_KEY, JSONUtil.toJsonStr(files1));//设置缓存
+
+            //方式2数据库查
+//            List<Files> files = fileMapper.selectList(null);
+//            //设置最新缓存
+//            setCache(Constants.FILES_KEY, JSONUtil.toJsonStr(files));
+//            方式3清空缓存
+//            flushRedis(Constants.FILES_KEY);
             return url;
         }
         return "";
@@ -127,6 +151,7 @@ public class FileController {
 
     /**
      * 分页查询
+     *
      * @param
      * @return
      * @date 2022/4/23 20:38
@@ -135,9 +160,9 @@ public class FileController {
     public Result findPage(@RequestParam Integer pageNum,
                            @RequestParam Integer pageSize,
                            @RequestParam(defaultValue = "") String name
-                           ) {
+    ) {
         QueryWrapper<Files> fileQueryWrapper = new QueryWrapper<>();
-        fileQueryWrapper.eq("is_delete", false);//就是0
+        fileQueryWrapper.eq("is_delete", false);//就是0,假删除
         if (!"".equals(name)) {
             fileQueryWrapper.like("name", name);
         }
@@ -146,10 +171,12 @@ public class FileController {
     }
 
     @DeleteMapping("/{id}")
+//    @CacheEvict(value = "files",key = "'frontAll'")//清空缓存,会重新请求数据
     public Result delete(@PathVariable Integer id) {
         Files files = fileMapper.selectById(id);
         files.setIsDelete(true);
         fileMapper.updateById(files);
+        flushRedis(Constants.FILES_KEY);
         return Result.success();
     }
 
@@ -167,13 +194,28 @@ public class FileController {
 
     /**
      * 是否启用
+     *
      * @param
      * @return
      * @date 2022/4/23 21:19
      */
     @PostMapping("/update")
+//    @CachePut(value = "files",key = "'frontAll'")//更新缓存
     public Result update(@RequestBody Files files) {
-        return Result.success(fileMapper.updateById(files));
+        fileMapper.updateById(files);
+//        List<Files> list = fileMapper.selectList(null);
+//        return Result.success(list);
+        flushRedis(Constants.FILES_KEY);
+        return Result.success();
     }
 
+    //删除缓存
+    private void flushRedis(String key) {
+        stringRedisTemplate.delete(key);
+    }
+
+    //设置缓存
+    private void setCache(String key, String value) {
+        stringRedisTemplate.opsForValue().set(key, value);
+    }
 }

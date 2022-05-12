@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -45,7 +46,7 @@ public class UserController {
     public Result register(@RequestBody UserDTO userDTO) {
         return Result.success(userService.register(userDTO));
     }
-    @PostMapping("check")
+    @PostMapping("/check")
     public Result check(@RequestBody UserDTO userDTO){
         return userService.check(userDTO);
     }
@@ -58,7 +59,10 @@ public class UserController {
     // 新增或者更新
     @PostMapping
     public Result save(@RequestBody User user) {
-        return Result.success(userService.saveOrUpdate(user));
+
+//        return userService.mysaveOrUpdate(user);
+        userService.saveOrUpdate(user);
+        return Result.success();
     }
 
     @DeleteMapping("/{id}")
@@ -76,6 +80,15 @@ public class UserController {
         return Result.success(userService.list());
     }
 
+    @GetMapping("/role/{role}")
+    public Result findUsersByRole(@PathVariable String role) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("role", role);
+        List<User> list = userService.list(queryWrapper);
+//        List<String> collect = list.stream().map(teacher -> teacher.getUsername()).collect(Collectors.toList());
+        return Result.success(list);
+    }
+
 
     @GetMapping("/username/{username}")
     public Result findOne(@PathVariable String username) {
@@ -89,23 +102,23 @@ public class UserController {
     public Result findPage(@RequestParam Integer pageNum,
                                @RequestParam Integer pageSize,
                                @RequestParam(defaultValue = "") String username,
-                               @RequestParam(defaultValue = "") String email,
+                               @RequestParam(defaultValue = "") String role,
                                @RequestParam(defaultValue = "") String address) {
-        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-
-        if (!"".equals(username)) {//不判空的话会直接拼%%,不好
-            userQueryWrapper.like("username", username);
-        }
-        if (!"".equals(email)) {
-            userQueryWrapper.like("email", email);
-        }
-        if (!"".equals(address)) {
-            userQueryWrapper.like("address", address);
-        }
-        //获取当前用户信息
-        User currentUser = TokenUtils.getCurrentUser();
-        System.out.println(currentUser.getUsername());
-        return Result.success(userService.page(new Page<>(pageNum, pageSize), userQueryWrapper));
+//        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+//
+//        if (!"".equals(username)) {//不判空的话会直接拼%%,不好
+//            userQueryWrapper.like("username", username);
+//        }
+//        if (!"".equals(role)) {
+//            userQueryWrapper.like("role", role);
+//        }
+//        if (!"".equals(address)) {
+//            userQueryWrapper.like("address", address);
+//        }
+//        //获取当前用户信息
+//        User currentUser = TokenUtils.getCurrentUser();
+//        System.out.println(currentUser.getUsername());
+        return Result.success(userService.findPage(new Page<>(pageNum, pageSize), username,role,address));
     }
 
     /**
@@ -154,24 +167,9 @@ public class UserController {
         InputStream inputStream = file.getInputStream();
         ExcelReader reader = ExcelUtil.getReader(inputStream);
         // 方式1：(推荐) 通过 javabean的方式读取Excel内的对象，但是要求表头必须是英文，跟javabean的属性要对应起来
-//        List<User> list = reader.readAll(User.class);
+        List<User> list = reader.readAll(User.class);
 
-        // 方式2：忽略表头的中文，直接读取表的内容
-        List<List<Object>> list = reader.read(1);
-        List<User> users = CollUtil.newArrayList();
-        for (List<Object> row : list) {
-            User user = new User();
-            user.setUsername(row.get(0).toString());
-            user.setPassword(row.get(1).toString());
-            user.setNickname(row.get(2).toString());
-            user.setEmail(row.get(3).toString());
-            user.setPhone(row.get(4).toString());
-            user.setAddress(row.get(5).toString());
-            user.setAvatarUrl(row.get(6).toString());
-            users.add(user);
-        }
-
-        userService.saveBatch(users);
+        userService.saveBatch(list);
         return Result.success(true);
     }
 }

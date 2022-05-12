@@ -21,7 +21,7 @@
           <i :class=item.icon></i><span slot="title">{{ item.name }}</span>
         </el-menu-item>
       </div>
-      <!--      二级菜单没有path-->
+      <!--      二级菜单没有path，应该遍历children-->
       <div v-else>
         <el-submenu :index="item.id + ''">
           <template slot="title"><i :class="item.icon"></i><span slot="title">{{ item.name }}</span></template>

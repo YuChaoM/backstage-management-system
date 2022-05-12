@@ -6,6 +6,6 @@ package com.yuchao.managementsystem.common;
  */
 public enum RoleEnum {
 
-    Role_ADMIN,
-    Role_USER;
+    ROLE_ADMIN,
+    ROLE_USER;
 }

@@ -37,6 +37,11 @@
       <el-table-column prop="name" label="文件名称"></el-table-column>
       <el-table-column prop="type" label="文件类型"></el-table-column>
       <el-table-column prop="size" label="文件大小(kb)"></el-table-column>
+      <el-table-column prop="size" label="预览">
+        <template slot-scope="scope">
+          <el-button type="primary" @click="preview(scope.row.url)">预览</el-button>
+        </template>
+      </el-table-column>
       <el-table-column label="下载">
         <template slot-scope="scope">
           <el-button type="primary" @click="download(scope.row.url)">下载</el-button>
@@ -114,7 +119,7 @@ export default {
     },
     changeEnable(row) {
       this.request.post("/file/update", row).then(res => {
-        console.log(row)
+        // console.log(res)
         if (res.code === '200') {
           this.$message.success("操作成功")
         }
@@ -164,8 +169,13 @@ export default {
       this.load()
     },
     download(url) {
+      console.log(url)
       window.open(url)
-    }
+    },
+    preview(url) {
+      window.open('https://file.keking.cn/onlinePreview?url=' + encodeURIComponent(window.btoa((url))))
+    },
+
   }
 }
 </script>

@@ -22,6 +22,18 @@ const routes = [
         name: '404',
         component: () => import('../views/404.vue')
     },
+    {
+        path: '/front',
+        name: 'Front',
+        component: () => import('../views/front/Front'),
+        children: [
+            {
+                path: 'home',//注意这里不能加/
+                name: 'FrontHome',
+                component: () => import('../views/front/Home.vue')
+            },
+        ]
+    },
 ]
 
 const router = new VueRouter({
@@ -38,7 +50,7 @@ const router = new VueRouter({
 //     // meta: { requiresAuth: true }, // 添加表示需要验证
 //
 //     children: [//子路由
-//         {path: 'home', name: '首页', component: () => import( '../views/Home.vue')},
+//         {path: 'home', name: '首页', component: () => import( '../views/Dashbord.vue')},
 //         {path: 'user', name: '用户管理', component: () => import( '../views/User.vue')},
 //         {path: 'role', name: '角色管理', component: () => import( '../views/Role.vue')},
 //         {path: 'menu', name: '菜单管理', component: () => import( '../views/Menu.vue')},
@@ -67,20 +79,31 @@ export const setRoutes = () => {
         if (!currentRouteNames.includes('Manage')) {
 
             // 拼装动态路由
-            const manageRoute = { path: '/', name: 'Manage', component: () => import('../views/Manage.vue'), redirect: "/home", children: [
+            const manageRoute = {
+                path: '/', name: 'Manage', component: () => import('../views/Manage.vue'), redirect: "/home",
+                children: [
                     {path: 'person', name: '个人信息', component: () => import( '../views/Person.vue')},
                     {path: 'password', name: '修改密码', component: () => import( '../views/Password.vue')},
-                ] }
+                ]
+            }
             const menus = JSON.parse(storeMenus)
             menus.forEach(item => {
                 if (item.path) {  // 当且仅当path不为空的时候才去设置路由
-                    let itemMenu = { path: item.path.replace("/", ""), name: item.name, component: () => import('../views/' + item.pagePath + '.vue')}
+                    let itemMenu = {
+                        path: item.path.replace("/", ""),
+                        name: item.name,
+                        component: () => import('../views/' + item.pagePath + '.vue')
+                    }
                     manageRoute.children.push(itemMenu)
-                } else if(item.children.length) {
+                } else if (item.children.length) {
                     //children,二级路由
                     item.children.forEach(item => {
                         if (item.path) {
-                            let itemMenu = { path: item.path.replace("/", ""), name: item.name, component: () => import('../views/' + item.pagePath + '.vue')}
+                            let itemMenu = {
+                                path: item.path.replace("/", ""),
+                                name: item.name,
+                                component: () => import('../views/' + item.pagePath + '.vue')
+                            }
                             manageRoute.children.push(itemMenu)
                         }
                     })
@@ -102,11 +125,11 @@ router.beforeEach((to, from, next) => {
     store.commit("setPath")  // 触发store的数据更新
 
     //未找到路由
-    if (!to.matched.length){
+    if (!to.matched.length) {
         const storeMenus = localStorage.getItem('menus')
-        if (storeMenus) {//不为空说明登陆过
+        if (storeMenus) {//如果为空转到404,不为空说明登陆过
             next("/404");
-        }else {
+        } else {
             //跳回登陆页面
             next("login")
         }

@@ -8,17 +8,16 @@
       </el-breadcrumb>
     </div>
 
-    <el-dropdown style="width: 100px;cursor: pointer">
+    <el-dropdown style="width: 150px;cursor: pointer">
       <div style="display: inline-block">
 <!--        <img :src="user.avatarUrl"-->
 <!--             style="width: 30px;border-radius: 50%;position:relative;top: 10px;right: 5px">-->
         <span style="right: 10px; position:relative;font-size: 16px;">{{ user.nickname }}</span>
-        <el-avatar size="large" :src="user.avatarUrl" style="position:relative;top: 12px;"></el-avatar>
-
+                <el-avatar :src="user.avatarUrl" fit="contain"  style="position:relative;top: 12px;"></el-avatar>
 <!--        <i class="el-icon-arrow-down" style="margin-left: 5px"></i>-->
       </div>
       <el-dropdown-menu slot="dropdown" style=" width: 100px; text-align: center">
-<!--        <el-dropdown-item >个人信息</el-dropdown-item>-->
+        <!--        <el-dropdown-item >个人信息</el-dropdown-item>-->
         <el-dropdown-item style="font-size: 14px; padding: 5px 0">
           <router-link to="/person" style="text-decoration: none">个人信息</router-link>
         </el-dropdown-item>

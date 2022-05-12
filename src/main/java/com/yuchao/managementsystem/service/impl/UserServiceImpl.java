@@ -3,9 +3,11 @@ package com.yuchao.managementsystem.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sun.org.apache.regexp.internal.RE;
 import com.yuchao.managementsystem.common.Constants;
 import com.yuchao.managementsystem.common.Result;
+import com.yuchao.managementsystem.common.RoleEnum;
 import com.yuchao.managementsystem.controller.dto.UserDTO;
 import com.yuchao.managementsystem.controller.dto.UserPasswordDTO;
 import com.yuchao.managementsystem.entity.Menu;
@@ -74,6 +76,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (user == null) {
             user = new User();
             BeanUtil.copyProperties(userdto, user, true);
+            user.setRole(RoleEnum.ROLE_USER.toString());//默认设置为普通用户
             save(user);//存进数据库里面
         } else {
             throw new ServiceException(Constants.CODE_600, "用户名已存在");
@@ -86,7 +89,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         User check = (User) getUserInfo(userDTO, "check").getData();
         if (check != null) {
 //            throw new ServiceException(Constants.CODE_600, "用户名已存在");
-            return Result.error(Constants.CODE_600, "用户名已存在");
+//            return Result.error(Constants.CODE_600, "用户名已存在");
+            return Result.error(Constants.CODE_600, "有内鬼，交易终止");
         }
         return Result.success();
     }
@@ -100,12 +104,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     }
 
+    @Override
+    public Result mysaveOrUpdate(User user) {
+        UserDTO userDTO = new UserDTO();
+        BeanUtil.copyProperties(user,userDTO,true);
+        Result check = check(userDTO);
+        if(check.getCode() == Constants.CODE_200){
+            saveOrUpdate(user);
+            return Result.success();
+        }else return check;
+    }
+
+    @Override
+    public Page<User> findPage(Page<User> page, String username, String role, String address) {
+        return userMapper.fingPage(page, username, role, address);
+    }
+
     private Result getUserInfo(UserDTO user, String status) {
         String username = user.getUsername();
         String password = user.getPassword();
         if ("check".equals(status) && !StrUtil.isBlank(username)) {
-
-        } else if (StrUtil.isBlank(username) || StrUtil.isBlank(password)) {
+            //不做任何行为，就是为了跳过下面的判断
+        } else if (StrUtil.isBlank(username) || StrUtil.isBlank(password)) {//注册和登录会传密码
             return Result.error(Constants.CODE_400, "参数错误");
         }
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();//去数据库查必须是实体类
@@ -119,7 +139,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             one = getOne(queryWrapper);
         } catch (Exception e) {
             log.info("{}", e);
-            throw new ServiceException(Constants.CODE_500, "系统错误");//会被捕获吗
+            throw new ServiceException(Constants.CODE_500, "系统错误");//会被捕获
         }
         return Result.success(one);
     }

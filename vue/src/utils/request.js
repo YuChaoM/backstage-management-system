@@ -2,7 +2,7 @@ import axios from 'axios'
 import ElementUI from "element-ui";
 const request = axios.create({
     baseURL: 'http://localhost:9090',
-    timeout: 5000
+    timeout: 10000//请求超时的响应时间
 })
 
 // request 拦截器

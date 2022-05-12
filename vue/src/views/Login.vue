@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper">
     <div
-        style="margin: 200px auto; background-color: #fff; width: 350px; height: 300px; padding: 20px; border-radius: 10px">
+        style="margin:auto;background-color: #fff; width: 350px; height: 300px; padding: 20px; border-radius: 10px">
       <div style="margin: 20px 0; text-align: center; font-size: 24px"><b>登 录</b></div>
       <el-form :model="user" :rules="rules" ref="userForm">
         <el-form-item prop="username">
@@ -51,13 +51,14 @@ export default {
               localStorage.setItem("menus", JSON.stringify(res.data.menus))  // 存储用户菜单信息到浏览器，只有登录的接口才会处理菜单信息
               // // 动态设置当前用户的路由
               setRoutes()
-              this.$router.push("/")
+              // this.$router.push("/")
               this.$message.success("登录成功")
-              // if (res.data.role === 'ROLE_STUDENT') {
-              //   this.$router.push("/front/home")
-              // } else {
-              //   this.$router.push("/")
-              // }
+              // debugger
+              if (res.data.role === 'ROLE_STUDENT') {//后台首页
+                this.$router.push("/front/home")
+              } else {//后台首页
+                this.$router.push("/")
+              }
             } else {
               this.$message.error(res.msg)//报后台返回的信息
             }
@@ -73,7 +74,12 @@ export default {
 <style>
 .wrapper {
   height: 100vh; /*撑满窗口*/
-  background-image: linear-gradient(to bottom right, #FC466B, #3F5EFB); /*渐变色*/
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /*background-image: linear-gradient(to bottom right, #FC466B, #3F5EFB); !*渐变色*!*/
+  background-image: url("../assets/login.jpg");
+  background-size: cover;
   /*background-image: linear-gradient(-20deg, #d558c8 0%, #24d292 100%);*/
   overflow: hidden;
 }

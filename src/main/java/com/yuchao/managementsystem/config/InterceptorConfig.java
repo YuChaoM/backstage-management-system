@@ -15,16 +15,20 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @EnableWebMvc:全面接管 1、静态资源？视图解析器？欢迎页.....全部失效
  */
 @Configuration
-public class InterceptorConfig  implements WebMvcConfigurer {
+public class InterceptorConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(LoginInterceptor())//通过LoginInterceptor写的策略，决定是否登录，没登录就拦截
                 .addPathPatterns("/**")//拦截所有,静态资源也被拦截了，css样式等
-                //额外放行的，另外一种方法是配置静态资源的访问前缀,这里开放了，不登录的导入和导出功能
-                .excludePathPatterns("/user/login", "/user/register", "/**/export", "/**/import","/file/**");
+                //额外放行的，另外一种方法是配置静态资源的访问前缀,这里开放了，不登录的导入和导出功能 "/file/**",
+//                .excludePathPatterns("/user/login", "/user/register","/user/check" ,"/**/export", "/**/import","/file/**",
+                .excludePathPatterns("/user/login", "/user/register", "/user/check","/file/upload","/course/export","/course/import",
+                        "/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**", "/api", "/api-docs", "/api-docs/**")
+                .excludePathPatterns("/**/*.html", "/**/*.js", "/**/*.css", "/**/*.woff", "/**/*.ttf", "/**/*.png", "/**/*.jpg");
 
     }
+
     @Bean
     public LoginInterceptor LoginInterceptor() {
         return new LoginInterceptor();
