@@ -1,9 +1,11 @@
 import axios from 'axios'
 import ElementUI from "element-ui";
 const request = axios.create({
+    // withCredentials:true,//配置这个请求才会带上cookie，session才能获取到值
     baseURL: 'http://localhost:9090',
     timeout: 10000//请求超时的响应时间
 })
+
 
 // request 拦截器
 // 可以自请求发送前对请求做一些处理

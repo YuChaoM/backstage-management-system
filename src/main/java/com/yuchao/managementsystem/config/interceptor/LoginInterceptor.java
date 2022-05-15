@@ -37,6 +37,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        System.out.println(request.getSession().getAttribute("captchaCode"));
         String token = request.getHeader("token");
         log.info(token);
         // 如果不是映射到方法直接通过

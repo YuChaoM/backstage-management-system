@@ -23,5 +23,6 @@ public class UserDTO {
     private String avatarUrl;
     private String token;
     private String role;
+    private String captchaCode;
     private List<Menu> menus;
 }

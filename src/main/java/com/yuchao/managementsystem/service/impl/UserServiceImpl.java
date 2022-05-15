@@ -4,7 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.sun.org.apache.regexp.internal.RE;
 import com.yuchao.managementsystem.common.Constants;
 import com.yuchao.managementsystem.common.Result;
 import com.yuchao.managementsystem.common.RoleEnum;
@@ -22,7 +21,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import com.yuchao.managementsystem.utils.TokenUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

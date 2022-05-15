@@ -243,7 +243,7 @@ export default {
       this.isinsert = false
     },
     del(id) {
-      this.request.delete("/user" + id).then(res => {
+      this.request.delete("/user/" + id).then(res => {
         if (res.code === '200') {
           this.$message.success("删除成功")
           // 为了在删除最后一页的最后一条数据时能成功跳转回最后一页的上一页

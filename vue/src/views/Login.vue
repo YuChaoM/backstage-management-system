@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper">
     <div
-        style="margin:auto;background-color: #fff; width: 350px; height: 300px; padding: 20px; border-radius: 10px">
+        style="margin:auto;background-color: #fff; width: 350px; height: 400px; padding: 20px; border-radius: 10px">
       <div style="margin: 20px 0; text-align: center; font-size: 24px"><b>登 录</b></div>
       <el-form :model="user" :rules="rules" ref="userForm">
         <el-form-item prop="username">
@@ -11,9 +11,16 @@
           <el-input size="medium" style="margin: 10px 0" prefix-icon="el-icon-lock" show-password
                     v-model="user.password"></el-input>
         </el-form-item>
+        <el-form-item prop="captcha">
+          <el-input size="medium" style="margin: 10px 0; width: 180px; vertical-align:middle" prefix-icon="el-icon-lock"
+                    v-model="user.captchaCode"></el-input>
+          <img :src="captchaUrl" style="padding: 0px 10px 0px 10px; vertical-align:middle" @click="updateCaptcha">
+        </el-form-item>
         <el-form-item style="margin: 10px 0; text-align: right">
           <el-button type="warning" size="small" autocomplete="off" @click="$router.push('/register')">注册</el-button>
           <el-button type="primary" size="small" autocomplete="off" @click="login">登录</el-button>
+        </el-form-item>
+        <el-form-item style="margin: 10px 0; text-align: right">
         </el-form-item>
       </el-form>
     </div>
@@ -37,14 +44,32 @@ export default {
           {required: true, message: '请输入密码', trigger: 'blur'},
           {min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur'}
         ],
-      }
+      },
+      captchaUrl: '',
+      key: '',
     }
   },
+  created() {
+    this.updateCaptcha()
+  },
   methods: {
+    updateCaptcha() {
+      this.request.get("/captcha/getkey").then(res => {
+        if (res.code === '200') {
+          console.log(res)
+          this.key = res.data
+          this.captchaUrl = 'http://localhost:9090/captcha?key=' + this.key
+        }
+      })
+    },
     login() {
       this.$refs['userForm'].validate((valid) => {//校验不合法时不会发请求
         if (valid) {  // 表单校验合法
-          this.request.post("/user/login", this.user).then(res => {
+          this.request.post("/user/login", this.user, {
+            params: {
+              key: this.key
+            }
+          }).then(res => {
             console.log(res)
             if (res.code === '200') {
               localStorage.setItem("user", JSON.stringify(res.data))  // 存储用户信息到浏览器,包含token
@@ -61,11 +86,12 @@ export default {
               }
             } else {
               this.$message.error(res.msg)//报后台返回的信息
+              this.updateCaptcha()
             }
 
           })
         }
-      });
+      })
     }
   }
 }
@@ -83,4 +109,5 @@ export default {
   /*background-image: linear-gradient(-20deg, #d558c8 0%, #24d292 100%);*/
   overflow: hidden;
 }
+
 </style>

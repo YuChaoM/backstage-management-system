@@ -1,23 +1,30 @@
 package com.yuchao.managementsystem.controller;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.yuchao.managementsystem.common.Constants;
 import com.yuchao.managementsystem.common.Result;
 import com.yuchao.managementsystem.controller.dto.UserDTO;
 import com.yuchao.managementsystem.controller.dto.UserPasswordDTO;
 import com.yuchao.managementsystem.entity.User;
+import com.yuchao.managementsystem.exception.ServiceException;
 import com.yuchao.managementsystem.service.IUserService;
 import com.yuchao.managementsystem.utils.TokenUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.List;
@@ -37,19 +44,36 @@ public class UserController {
     @Resource
     private IUserService userService;
 
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     @PostMapping("/login")
-    public Result login(@RequestBody UserDTO userDTO) {
-        return userService.login(userDTO);
+    public Result login(@RequestBody UserDTO userDTO, @RequestParam(defaultValue = "") String key) {
+        String code = userDTO.getCaptchaCode();
+        String captchaCode = "";
+        if (!StrUtil.isBlank(key)) {
+            captchaCode = stringRedisTemplate.opsForValue().get(key);
+        }
+        System.out.println("验证码是" + captchaCode);
+        if (StrUtil.isBlank(code) || StrUtil.isBlank(captchaCode)) {
+            throw new ServiceException(Constants.CODE_600, "请输入验证码");
+        } else if (!code.equalsIgnoreCase(captchaCode)) {
+            throw new ServiceException(Constants.CODE_600, "验证码错误");
+        } else {
+            return userService.login(userDTO);
+        }
     }
+
     @PostMapping("/register")
     public Result register(@RequestBody UserDTO userDTO) {
         return Result.success(userService.register(userDTO));
     }
+
     @PostMapping("/check")
-    public Result check(@RequestBody UserDTO userDTO){
+    public Result check(@RequestBody UserDTO userDTO) {
         return userService.check(userDTO);
     }
+
     @PostMapping("/password")
     public Result updatePassword(@RequestBody UserPasswordDTO userPasswordDTO) {
         userService.updatePassword(userPasswordDTO);
@@ -100,10 +124,10 @@ public class UserController {
     //分页查询 mybatis-plus的方式，模糊查询也用它
     @GetMapping("/page")
     public Result findPage(@RequestParam Integer pageNum,
-                               @RequestParam Integer pageSize,
-                               @RequestParam(defaultValue = "") String username,
-                               @RequestParam(defaultValue = "") String role,
-                               @RequestParam(defaultValue = "") String address) {
+                           @RequestParam Integer pageSize,
+                           @RequestParam(defaultValue = "") String username,
+                           @RequestParam(defaultValue = "") String role,
+                           @RequestParam(defaultValue = "") String address) {
 //        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
 //
 //        if (!"".equals(username)) {//不判空的话会直接拼%%,不好
@@ -118,7 +142,7 @@ public class UserController {
 //        //获取当前用户信息
 //        User currentUser = TokenUtils.getCurrentUser();
 //        System.out.println(currentUser.getUsername());
-        return Result.success(userService.findPage(new Page<>(pageNum, pageSize), username,role,address));
+        return Result.success(userService.findPage(new Page<>(pageNum, pageSize), username, role, address));
     }
 
     /**
@@ -159,6 +183,7 @@ public class UserController {
 
     /**
      * excel 导入
+     *
      * @param file
      * @throws Exception
      */
