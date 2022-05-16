@@ -45,4 +45,20 @@
             </if>
         </where>
     </select>
+    <select id="getAvatarUrlByNanme" resultType="java.lang.String">
+        select avatar_url from sys_user
+        <where>
+            <if test="username != null">
+                 username = #{username}
+            </if>
+        </where>
+    </select>
+    <select id="getAvatarUrlByEmail" resultType="java.lang.String">
+        select avatar_url from sys_user
+        <where>
+            <if test="email != null">
+                email = #{email}
+            </if>
+        </where>
+    </select>
 </mapper>

@@ -20,6 +20,8 @@ public class UserDTO {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     private String nickname;
+    private String email;
+    private String code;
     private String avatarUrl;
     private String token;
     private String role;

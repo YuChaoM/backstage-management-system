@@ -1,21 +1,19 @@
 package com.yuchao.managementsystem.controller;
 
 import cn.hutool.captcha.CaptchaUtil;
-import cn.hutool.captcha.GifCaptcha;
+import cn.hutool.captcha.ShearCaptcha;
 import cn.hutool.core.lang.ObjectId;
 import cn.hutool.core.util.StrUtil;
-import com.yuchao.managementsystem.common.Constants;
 import com.yuchao.managementsystem.common.Result;
-import io.swagger.annotations.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -41,13 +39,15 @@ public class CaptchaController {
     @GetMapping
     public void getCaptcha(@RequestParam(defaultValue = "") String key, HttpServletResponse response) throws IOException {
         if (!StrUtil.isBlank(key)) {
-            GifCaptcha gifCaptcha = CaptchaUtil.createGifCaptcha(100, 36);
-            String code = gifCaptcha.getCode();
+//            GifCaptcha captcha = CaptchaUtil.createGifCaptcha(100, 36);
+            ShearCaptcha captcha = CaptchaUtil.createShearCaptcha(100, 36);
+//            LineCaptcha captcha = CaptchaUtil.createLineCaptcha(100, 36);
+            String code = captcha.getCode();
             ServletOutputStream os = response.getOutputStream();
             stringRedisTemplate.opsForValue().set(key, code);
             stringRedisTemplate.expire(key, 5, TimeUnit.MINUTES);
             //把图片验证码返回给前端
-            gifCaptcha.write(os);
+            captcha.write(os);
             os.close();
         }
 //        return Result.success(code);

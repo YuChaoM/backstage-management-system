@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yuchao.managementsystem.common.Constants;
 import com.yuchao.managementsystem.common.Result;
+import com.yuchao.managementsystem.config.AuthAccess;
 import com.yuchao.managementsystem.controller.dto.UserDTO;
 import com.yuchao.managementsystem.controller.dto.UserPasswordDTO;
 import com.yuchao.managementsystem.entity.User;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.mail.MessagingException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -64,6 +66,19 @@ public class UserController {
         }
     }
 
+    @AuthAccess
+    @PostMapping("/loginByEmail")
+    public Result loginByEmail(@RequestBody UserDTO userDTO, @RequestParam(defaultValue = "") String key) {
+        return userService.loginByEmail(userDTO,key);
+
+    }
+    @AuthAccess
+    @GetMapping("/email/{email}/{type}")
+    public Result sendEmailCode(@PathVariable String email,@PathVariable Integer type,@RequestParam(defaultValue = "") String key) throws MessagingException {
+        userService.sendEmailCode(email,type,key);
+        return Result.success();
+    }
+
     @PostMapping("/register")
     public Result register(@RequestBody UserDTO userDTO) {
         return Result.success(userService.register(userDTO));
@@ -77,6 +92,13 @@ public class UserController {
     @PostMapping("/password")
     public Result updatePassword(@RequestBody UserPasswordDTO userPasswordDTO) {
         userService.updatePassword(userPasswordDTO);
+        return Result.success();
+    }
+
+    @AuthAccess
+    @PutMapping("/rest")
+    public Result restPassword(@RequestBody UserPasswordDTO userPasswordDTO,  @RequestParam(defaultValue = "") String key) {
+        userService.restPassword(userPasswordDTO,key);
         return Result.success();
     }
 
@@ -196,6 +218,12 @@ public class UserController {
 
         userService.saveBatch(list);
         return Result.success(true);
+    }
+
+    @AuthAccess
+    @GetMapping("/getavatar")//这种只有RequestParam不能用post请求，post用RequestBody,
+    public Result getAvatarUrl(@RequestParam()Integer type,@RequestParam String temp) {
+        return userService.getAvatarUrl(type,temp);
     }
 }
 

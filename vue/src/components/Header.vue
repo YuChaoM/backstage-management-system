@@ -13,7 +13,7 @@
 <!--        <img :src="user.avatarUrl"-->
 <!--             style="width: 30px;border-radius: 50%;position:relative;top: 10px;right: 5px">-->
         <span style="right: 10px; position:relative;font-size: 16px;">{{ user.nickname }}</span>
-                <el-avatar :src="user.avatarUrl" fit="contain"  style="position:relative;top: 12px;"></el-avatar>
+        <el-avatar :src="user.avatarUrl" fit="contain"  style="position:relative;top: 12px;"></el-avatar>
 <!--        <i class="el-icon-arrow-down" style="margin-left: 5px"></i>-->
       </div>
       <el-dropdown-menu slot="dropdown" style=" width: 100px; text-align: center">
