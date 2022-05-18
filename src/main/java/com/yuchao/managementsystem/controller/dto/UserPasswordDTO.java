@@ -13,5 +13,6 @@ public class UserPasswordDTO {
     private String password;
     private String newPassword;
     private String email;
-    private String code;
+    private String captchaCode;
+    String key;
 }

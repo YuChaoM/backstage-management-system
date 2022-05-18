@@ -1,14 +1,14 @@
 <template>
   <div class="wrapper">
     <div style="border-radius: 10px;background-color: #fff;">
-      <el-tabs v-model="activeName" type="card">
+      <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
         <el-tab-pane label="密码登录" name="first">
           <div
               style="margin:0px auto; width: 350px; height: 450px;padding: 0px 20px;">
             <el-avatar :src="avatarUrl" :size="70" style="margin:20px 175px 20px 115px "></el-avatar>
             <el-form :model="user" :rules="rules" ref="userForm">
               <el-form-item prop="username">
-                <el-input size="medium" style="margin: 10px 0" prefix-icon="el-icon-user"
+                <el-input size="medium" style="margin: 10px 0" prefix-icon="el-icon-user" placeholder="请输入用户名"
                           v-model="user.username" @blur="getAvatarUrl(1)"></el-input>
               </el-form-item>
               <el-form-item prop="password">
@@ -41,9 +41,9 @@
                 <el-input size="medium" style="margin: 10px 0" prefix-icon="el-icon-message"
                           v-model="user.email" @blur="getAvatarUrl(2)"></el-input>
               </el-form-item>
-              <el-form-item prop="code">
+              <el-form-item prop="captchaCode">
                 <el-input size="medium" style="margin: 10px 0; width: 195px" prefix-icon="el-icon-lock"
-                          v-model="user.code" @keydown.enter.native="loginByEmail"></el-input>
+                          v-model="user.captchaCode" @keydown.enter.native="loginByEmail"></el-input>
                 <el-button type="primary" size="small" class="ml-5" @click="sendCode(1)" :disabled="disabled">
                   {{ btnText }}
                 </el-button>
@@ -75,8 +75,11 @@
         </el-form-item>
         <el-form-item label="验证码">
           <el-input size="medium" style="margin: 10px 0; width: 190px" prefix-icon="el-icon-lock"
-                    v-model="pass.code"></el-input>
-          <el-button type="primary" size="small" class="ml-5" @click="sendCode(2)" :disabled="disabled">{{ btnText }}</el-button>
+                    v-model="pass.captchaCode"></el-input>
+          <el-button type="primary" size="small" class="ml-5" @click="sendCode(2)" :disabled="disabled">{{
+              btnText
+            }}
+          </el-button>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -96,8 +99,8 @@ export default {
     return {
       activeName: 'first',
       disabled: false,
-      interval:undefined,
-      totalCount:0,
+      interval: undefined,
+      totalCount: 0,
       dialogFormVisible: false,
       pass: {},
       user: {},//user对象发送到后台校验
@@ -123,12 +126,11 @@ export default {
       },
       captchaUrl: '',
       avatarUrl: '',
-      key: '',
     }
   },
   computed: {
-    btnText(){
-      return this.totalCount !==0? `${this.totalCount}秒再次获取`: "获取验证码"
+    btnText() {
+      return this.totalCount !== 0 ? `${this.totalCount}秒再次获取` : "获取验证码"
     }
   },
   created() {
@@ -139,10 +141,16 @@ export default {
       this.request.get("/captcha/getkey").then(res => {
         if (res.code === '200') {
           console.log(res)
-          this.key = res.data
-          this.captchaUrl = 'http://localhost:9090/captcha?key=' + this.key
+          this.user.key = res.data
+          this.captchaUrl = 'http://localhost:9090/captcha?key=' + res.data
         }
       })
+    },
+    handleClick(tab) {
+      this.activeName = tab.name
+      if (this.activeName === 'first') {
+        this.updateCaptcha()
+      }
     },
     handlePass() {
       this.dialogFormVisible = true
@@ -156,14 +164,13 @@ export default {
             this.$message.error("2次输入的新密码不相同")
             return false
           }
-          this.request.put("/user/rest", this.pass, {
-            params: {
-              key: this.key
-            }
-          }).then(res => {
+          this.pass.key = this.user.key
+          console.log(this.pass.key)
+          this.request.put("/user/rest", this.pass).then(res => {
             if (res.code === '200') {
               this.$message.success("密码重置成功，")
               this.dialogFormVisible = false
+              this.updateCaptcha()//更新验证码
             } else {
               this.$message.error(res.msg)
             }
@@ -174,11 +181,7 @@ export default {
     login() {
       this.$refs['userForm'].validate((valid) => {//校验不合法时不会发请求
         if (valid) {  // 表单校验合法
-          this.request.post("/user/login", this.user, {
-            params: {
-              key: this.key
-            }
-          }).then(res => {
+          this.request.post("/user/login", this.user).then(res => {
             console.log(res)
             if (res.code === '200') {
               localStorage.setItem("user", JSON.stringify(res.data))  // 存储用户信息到浏览器,包含token
@@ -207,15 +210,11 @@ export default {
         this.$message.warning("请输入邮箱")
         return
       }
-      if (!this.user.code) {
+      if (!this.user.captchaCode) {
         this.$message.warning("请输入验证码")
         return
       }
-      this.request.post("/user/loginByEmail", this.user, {
-        params: {
-          key: this.key
-        }
-      }).then(res => {
+      this.request.post("/user/loginByEmail", this.user).then(res => {
         console.log(res)
         if (res.code === '200') {
           localStorage.setItem("user", JSON.stringify(res.data))  // 存储用户信息到浏览器,包含token
@@ -232,22 +231,21 @@ export default {
           }
         } else {
           this.$message.error(res.msg)//报后台返回的信息
-          this.updateCaptcha()
         }
       })
     },
-    sendCode(type){
+    sendCode(type) {
       // 按钮60秒倒计时
-      this.disabled=true
-      this.totalCount=60
+      this.disabled = true
+      this.totalCount = 60
       this.sendEmailCode(type) //60秒过倒计时过后才能调用的事件
-      this.interval=setInterval(()=>{
+      this.interval = setInterval(() => {
         this.totalCount--
-        if(this.totalCount === 0){
+        if (this.totalCount === 0) {
           clearInterval(this.interval)
-          this.disabled=false
+          this.disabled = false
         }
-      },1000);
+      }, 1000);
     },
     sendEmailCode(type) {
       let email;
@@ -265,10 +263,9 @@ export default {
         this.$message.warning("请输入正确的邮箱账号")
         return
       }
-      //发送邮箱验证码
       this.request.get("/user/email/" + email + "/" + type, {
         params: {
-          key: this.key
+          key: this.user.key
         }
       }).then(res => {
         if (res.code === '200') {
@@ -293,7 +290,7 @@ export default {
       }).then(res => {
         this.avatarUrl = res.data
       })
-    }
+    },
   }
 }
 </script>

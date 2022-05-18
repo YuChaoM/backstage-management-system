@@ -26,7 +26,7 @@
         <el-input type="textarea" v-model="form.address" autocomplete="off"></el-input>
       </el-form-item>
       <el-form-item >
-        <el-button type="primary" @click="save()">确 定</el-button>
+        <el-button type="primary" style="float:right" @click="save()">确 定</el-button>
       </el-form-item>
     </el-form>
 <!--    <div slot="footer" class="dialog-footer">-->

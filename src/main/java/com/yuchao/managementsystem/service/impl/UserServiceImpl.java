@@ -69,35 +69,68 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public Result login(UserDTO userdto) {
-        User one = (User) getUserInfo(userdto, "login").getData();
-        if (one != null) {
-            BeanUtil.copyProperties(one, userdto, true);
-            //设置token
-            String token = TokenUtils.genToken(one.getId().toString(), one.getPassword());
-            userdto.setToken(token);
-
-            String role = one.getRole();
-            //获取用户的菜单列表
-            List<Menu> roleMenus = getRoleMenu(role);
-            userdto.setMenus(roleMenus);
-            return Result.success(userdto);
-        } else {
-            throw new ServiceException(Constants.CODE_600, "用户名或密码错误");
+        String username = userdto.getUsername();
+        String captchaCode = userdto.getCaptchaCode();
+        String key = userdto.getKey();
+        String code = "";
+        if (!StrUtil.isBlank(key)) {
+            code = stringRedisTemplate.opsForValue().get(key);
+            if (StrUtil.isBlank(code)){
+                throw new ServiceException(Constants.CODE_600, "验证码过期，请重新获取");
+            }
         }
+        if (StrUtil.isBlank(username) || StrUtil.isBlank(captchaCode)){
+            throw new ServiceException(Constants.CODE_400,"参数错误");
+        }else if (!code.equalsIgnoreCase(captchaCode)){
+            throw new ServiceException(Constants.CODE_600, "验证码错误");
+        }else {
+            User one = (User) getUserInfo(userdto, "login").getData();
+            if (one != null) {
+                BeanUtil.copyProperties(one, userdto, true);
+                //设置token
+                String token = TokenUtils.genToken(one.getId().toString(), one.getPassword());
+                userdto.setToken(token);
+
+                String role = one.getRole();
+                //获取用户的菜单列表
+                List<Menu> roleMenus = getRoleMenu(role);
+                userdto.setMenus(roleMenus);
+                return Result.success(userdto);
+            } else {
+                throw new ServiceException(Constants.CODE_600, "用户名或密码错误");
+            }
+        }
+
     }
 
     @Override
-    public Result register(UserDTO userdto) {
-        User user = (User) getUserInfo(userdto, "register").getData();//先检验数据库没有再存
-        if (user == null) {
-            user = new User();
-            BeanUtil.copyProperties(userdto, user, true);
-            user.setRole(RoleEnum.ROLE_USER.toString());//默认设置为普通用户
-            save(user);//存进数据库里面
-        } else {
-            throw new ServiceException(Constants.CODE_600, "用户名已存在");
+    public void register(UserDTO userdto) {
+        String email = userdto.getEmail();
+        String captchaCode = userdto.getCaptchaCode();
+        String key = userdto.getKey();
+        String code = "";
+        if (!StrUtil.isBlank(key)) {
+            code = stringRedisTemplate.opsForValue().get(key);
+            if (StrUtil.isBlank(code)){
+                throw new ServiceException(Constants.CODE_600, "验证码过期，请重新获取");
+            }
         }
-        return Result.success(user);
+        if (StrUtil.isBlank(email) || StrUtil.isBlank(captchaCode)){
+            throw new ServiceException(Constants.CODE_400,"参数错误");
+        }else if (!code.equalsIgnoreCase(captchaCode)){
+            throw new ServiceException(Constants.CODE_600, "验证码错误");
+        }else {
+            User user = (User) getUserInfo(userdto, "register").getData();//先检验数据库没有再存
+            if (user == null) {
+                user = new User();
+                BeanUtil.copyProperties(userdto, user, true);
+                user.setRole(RoleEnum.ROLE_USER.toString());//默认设置为普通用户
+                save(user);//存进数据库里面
+            } else {
+                throw new ServiceException(Constants.CODE_600, "用户名已存在");
+            }
+
+        }
     }
 
     @Override
@@ -137,17 +170,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public Result loginByEmail(UserDTO userDTO, String key) {
+    public Result loginByEmail(UserDTO userDTO) {
         String email = userDTO.getEmail();
-        String code = userDTO.getCode();
-        String captchaCode = "";
+        String captchaCode = userDTO.getCaptchaCode();
+        String key = userDTO.getKey();
+        String code = "";
         if (!StrUtil.isBlank(key)) {
-            captchaCode = stringRedisTemplate.opsForValue().get(key);
-            if (StrUtil.isBlank(captchaCode)){
+            code = stringRedisTemplate.opsForValue().get(key);
+            if (StrUtil.isBlank(code)){
                 throw new ServiceException(Constants.CODE_600, "验证码过期，请重新获取");
             }
         }
-        if (StrUtil.isBlank(email) || StrUtil.isBlank(code)){
+        if (StrUtil.isBlank(email) || StrUtil.isBlank(captchaCode)){
             throw new ServiceException(Constants.CODE_400,"参数错误");
         }else if (!code.equalsIgnoreCase(captchaCode)){
             throw new ServiceException(Constants.CODE_600, "验证码错误");
@@ -186,7 +220,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 message.setFrom(from);  // 发送人
                 message.setTo(email);
                 message.setSentDate(now);
-                message.setSubject("【yuchao】登录邮箱验证");
+                message.setSubject("【yuc喊你来验证】登录验证");
                 message.setText("您本次登录的验证码是：" + code + "，有效期5分钟。请妥善保管，切勿泄露,如非本人操作请忽略");
                 javaMailSender.send(message);
             } else if (ValidationEnum.FORGET_PASS.getType().equals(type)){//修改密码验证
@@ -195,7 +229,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 helper.setFrom(from);  // 发送人
                 helper.setTo(email);
                 helper.setSentDate(now);  // 富文本
-                helper.setSubject("【yuchao】忘记密码验证");
+                helper.setSubject("【yuc喊你来验证】忘记密码验证");
                 String context="<b>尊敬的用户：</b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;您好，您本次忘记密码的验证码是："+
                         "<b color=\"'red'\">"  + code + "</b><br>"
                         +"，有效期5分钟。请妥善保管，切勿泄露";
@@ -212,20 +246,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public void restPassword(UserPasswordDTO userPasswordDTO, String key) {
+    public void restPassword(UserPasswordDTO userPasswordDTO) {
         String email = userPasswordDTO.getEmail();
         String newPassword = userPasswordDTO.getNewPassword();
-        String code = userPasswordDTO.getCode();
-        String captchaCode = "";
+        String captchaCode = userPasswordDTO.getCaptchaCode();
+        String key = userPasswordDTO.getKey();
+        String code = "";
         if (!StrUtil.isBlank(key)) {
-            captchaCode = stringRedisTemplate.opsForValue().get(key);
-            if (StrUtil.isBlank(captchaCode)) {
+            code = stringRedisTemplate.opsForValue().get(key);
+            if (StrUtil.isBlank(code)) {
                 throw new ServiceException(Constants.CODE_600, "验证码过期，请重新获取");
             }
         }else {
             throw new ServiceException(Constants.CODE_500, "系统错误");
         }
-        if (StrUtil.isBlank(email) || StrUtil.isBlank(code)) {
+        if (StrUtil.isBlank(email) || StrUtil.isBlank(captchaCode)) {
             throw new ServiceException(Constants.CODE_400, "参数错误");
         } else if (!code.equalsIgnoreCase(captchaCode)) {
             throw new ServiceException(Constants.CODE_600, "验证码错误");

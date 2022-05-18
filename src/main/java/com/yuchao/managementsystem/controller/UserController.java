@@ -16,6 +16,7 @@ import com.yuchao.managementsystem.entity.User;
 import com.yuchao.managementsystem.exception.ServiceException;
 import com.yuchao.managementsystem.service.IUserService;
 import com.yuchao.managementsystem.utils.TokenUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -40,6 +41,7 @@ import java.util.stream.Collectors;
  * @author yuchao
  * @since 2022-04-17
  */
+@Slf4j
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -50,43 +52,33 @@ public class UserController {
     private StringRedisTemplate stringRedisTemplate;
 
     @PostMapping("/login")
-    public Result login(@RequestBody UserDTO userDTO, @RequestParam(defaultValue = "") String key) {
-        String code = userDTO.getCaptchaCode();
-        String captchaCode = "";
-        if (!StrUtil.isBlank(key)) {
-            captchaCode = stringRedisTemplate.opsForValue().get(key);
-        }
-        System.out.println("验证码是" + captchaCode);
-        if (StrUtil.isBlank(code) || StrUtil.isBlank(captchaCode)) {
-            throw new ServiceException(Constants.CODE_600, "请输入验证码");
-        } else if (!code.equalsIgnoreCase(captchaCode)) {
-            throw new ServiceException(Constants.CODE_600, "验证码错误");
-        } else {
-            return userService.login(userDTO);
-        }
+    public Result login(@RequestBody UserDTO userDto) {
+        return userService.login(userDto);
     }
 
     @AuthAccess
     @PostMapping("/loginByEmail")
-    public Result loginByEmail(@RequestBody UserDTO userDTO, @RequestParam(defaultValue = "") String key) {
-        return userService.loginByEmail(userDTO,key);
+    public Result loginByEmail(@RequestBody UserDTO userDto) {
+        return userService.loginByEmail(userDto);
 
     }
+
     @AuthAccess
     @GetMapping("/email/{email}/{type}")
-    public Result sendEmailCode(@PathVariable String email,@PathVariable Integer type,@RequestParam(defaultValue = "") String key) throws MessagingException {
-        userService.sendEmailCode(email,type,key);
+    public Result sendEmailCode(@PathVariable String email, @PathVariable Integer type, @RequestParam(defaultValue = "") String key) throws MessagingException {
+        userService.sendEmailCode(email, type, key);
         return Result.success();
     }
 
     @PostMapping("/register")
-    public Result register(@RequestBody UserDTO userDTO) {
-        return Result.success(userService.register(userDTO));
+    public Result register(@RequestBody UserDTO userDto) {
+        userService.register(userDto);
+        return Result.success();
     }
 
     @PostMapping("/check")
-    public Result check(@RequestBody UserDTO userDTO) {
-        return userService.check(userDTO);
+    public Result check(@RequestBody UserDTO userDto) {
+        return userService.check(userDto);
     }
 
     @PostMapping("/password")
@@ -97,8 +89,8 @@ public class UserController {
 
     @AuthAccess
     @PutMapping("/rest")
-    public Result restPassword(@RequestBody UserPasswordDTO userPasswordDTO,  @RequestParam(defaultValue = "") String key) {
-        userService.restPassword(userPasswordDTO,key);
+    public Result restPassword(@RequestBody UserPasswordDTO userPasswordDto) {
+        userService.restPassword(userPasswordDto);
         return Result.success();
     }
 
@@ -222,8 +214,8 @@ public class UserController {
 
     @AuthAccess
     @GetMapping("/getavatar")//这种只有RequestParam不能用post请求，post用RequestBody,
-    public Result getAvatarUrl(@RequestParam()Integer type,@RequestParam String temp) {
-        return userService.getAvatarUrl(type,temp);
+    public Result getAvatarUrl(@RequestParam() Integer type, @RequestParam String temp) {
+        return userService.getAvatarUrl(type, temp);
     }
 }
 

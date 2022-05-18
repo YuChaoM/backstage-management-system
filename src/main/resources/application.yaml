@@ -48,3 +48,10 @@ files:
   upload:
     path: E:\Users\Desktop\backstageManagementSystem\temp\files\
 
+
+#调整日志级别
+logging:
+  level:
+    com.yuchao: trace #指定包的日志级别
+  file:
+    path: springbootlog #没指定具体路径在当前项目下生成

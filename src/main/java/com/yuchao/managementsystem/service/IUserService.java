@@ -21,7 +21,7 @@ public interface IUserService extends IService<User> {
 
     Result login(UserDTO user);
 
-    Result register(UserDTO userdto);
+    void register(UserDTO userdto);
 
     Result check(UserDTO userDTO);
 
@@ -31,11 +31,11 @@ public interface IUserService extends IService<User> {
 
     Page<User>  findPage(Page<User> objectPage, String username, String role, String address);
 
-    Result loginByEmail(UserDTO userDTO, String key);
+    Result loginByEmail(UserDTO userDTO);
 
     void sendEmailCode(String email, Integer key, String s) throws MessagingException;
 
-    void restPassword(UserPasswordDTO userPasswordDTO, String key);
+    void restPassword(UserPasswordDTO userPasswordDTO);
 
     Result getAvatarUrl(Integer type, String temp);
 }
