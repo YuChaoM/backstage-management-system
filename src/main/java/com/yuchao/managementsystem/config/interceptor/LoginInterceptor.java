@@ -28,16 +28,15 @@ import javax.servlet.http.HttpSession;
  */
 @Slf4j
 public class LoginInterceptor implements HandlerInterceptor {
-    /**
-     * 目标方法执行之前
-     */
+
 
     @Autowired
     private IUserService userService;
-
+    /**
+     * 目标方法执行之前
+     */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        System.out.println(request.getSession().getAttribute("captchaCode"));
         String token = request.getHeader("token");
         log.info(token);
         // 如果不是映射到方法直接通过

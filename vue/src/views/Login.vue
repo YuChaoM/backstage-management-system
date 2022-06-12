@@ -92,6 +92,7 @@
 
 <script>
 import {setRoutes} from "@/router";
+import {serverIp} from "../../public/config";
 
 export default {
   name: "Login",
@@ -107,7 +108,7 @@ export default {
       rules: {//表单校验规则
         username: [
           {required: true, message: '请输入用户名', trigger: 'blur'},
-          {min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur'}
+          {min: 3, max: 10, message: '长度在 3 到 20 个字符', trigger: 'blur'}
         ],
         password: [
           {required: true, message: '请输入密码', trigger: 'blur'},
@@ -128,6 +129,14 @@ export default {
       avatarUrl: '',
     }
   },
+  metaInfo() {
+    return {
+      title: "login",
+      meta: [
+        {name: "referrer", content: "no-referrer"},
+      ],
+    };
+  },
   computed: {
     btnText() {
       return this.totalCount !== 0 ? `${this.totalCount}秒再次获取` : "获取验证码"
@@ -142,7 +151,7 @@ export default {
         if (res.code === '200') {
           console.log(res)
           this.user.key = res.data
-          this.captchaUrl = 'http://localhost:9090/captcha?key=' + res.data
+          this.captchaUrl = `http://${serverIp}:9090/captcha?key=` + res.data
         }
       })
     },
@@ -180,6 +189,7 @@ export default {
     },
     login() {
       this.$refs['userForm'].validate((valid) => {//校验不合法时不会发请求
+        console.log(valid) //失效了
         if (valid) {  // 表单校验合法
           this.request.post("/user/login", this.user).then(res => {
             console.log(res)
@@ -302,11 +312,11 @@ export default {
   justify-content: center;
   align-items: center;
   /*background-image: linear-gradient(to bottom right, #FC466B, #3F5EFB); !*渐变色*!*/
-  background-image: url("../assets/login.jpg");
+  background-image: url("https://fastly.jsdelivr.net/gh/YuChaoM/images/OS/login.32c09ed0.jpg");
   background-size: cover;
   /*background-image: linear-gradient(-20deg, #d558c8 0%, #24d292 100%);*/
   overflow: hidden;
-  border-radius: 10px;
+  /*border-radius: 10px;*/
 }
 
 </style>

@@ -32,6 +32,16 @@ const routes = [
                 name: 'FrontHome',
                 component: () => import('../views/front/Home.vue')
             },
+            {
+                path: 'article',//注意这里不能加/
+                name: 'FrontArticle',
+                component: () => import('../views/front/Article.vue')
+            },
+            {
+                path: 'articleDetail',//注意这里不能加/
+                name: 'ArticleDetail',
+                component: () => import('../views/front/ArticleDetail.vue')
+            },
         ]
     },
 ]

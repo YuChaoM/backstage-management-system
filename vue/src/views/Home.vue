@@ -17,7 +17,7 @@
             <span>得闲饮茶</span>
           </div>
           <div style="text-align: center">
-            <img style="height: 300px" src="https://cdn.jsdelivr.net/gh/YuChaoM/images/Golang/11213917c59e902b48a0825090ac018.jpg" alt="">
+            <img style="height: 300px" src="https://fastly.jsdelivr.net/gh/YuChaoM/images/Golang/11213917c59e902b48a0825090ac018.jpg" alt="">
             <div class="pd-10">关注我</div>
           </div>
         </el-card>
@@ -54,7 +54,12 @@
         </div>
       </el-col>
     </el-row>
+
+      <el-dialog title="温馨提示" :visible.sync="Visit" width="30%" v-if="user.role == 'ROLE_USER' ">
+        <div >请联系管理员开通权限:mengyuchaotide@gmail.com</div>
+      </el-dialog>
   </div>
+
 </template>
 
 <script>
@@ -62,6 +67,7 @@ export default {
   name: "Home",
   data() {
     return {
+      Visit: true,
       user: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {}
     }
   }

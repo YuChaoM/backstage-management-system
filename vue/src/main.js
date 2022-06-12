@@ -8,6 +8,12 @@ import './assets/gloable.css'
 import request from "@/utils/request";
 import store from './store'
 import axios from "axios";
+import mavonEditor from 'mavon-editor'
+import 'mavon-editor/dist/css/index.css'
+Vue.use(mavonEditor)
+
+import Meta from "vue-meta";
+Vue.use(Meta);
 
 Vue.config.productionTip = false
 Vue.use(ElementUI, {size: "mini"});

@@ -164,7 +164,7 @@ export default {
   align-items: center;
   /*background-image: linear-gradient(to bottom right, #FC466B , #3F5EFB);*/
   /*background-image: linear-gradient(-20deg, #b721ff 0%, #21d4fd 100%);*/
-  background-image: url("../assets/login.jpg");
+  background-image: url("https://fastly.jsdelivr.net/gh/YuChaoM/images/OS/login.32c09ed0.jpg");
   background-size: cover;
   overflow: hidden;
 }

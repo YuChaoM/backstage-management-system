@@ -59,6 +59,13 @@ export default {
       // user: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {}
     }
   },
+  metaInfo() {
+    return {
+      meta: [
+        {name: "referrer", content: "no-referrer"},
+      ],
+    };
+  },
   inject: ["fatherMethod"],//注入进来
   methods: {
     collapse() {

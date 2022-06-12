@@ -25,7 +25,7 @@
           >
             <el-button class="ml-5" type="danger" slot="reference">批量删除<i class="el-icon-remove"/></el-button>
           </el-popconfirm>
-          <el-upload action="http://localhost:9090/menu/import" :show-file-list="false" accept="xlsx" :on-success="handelExcelImportSuccess" style="display: inline-block">
+          <el-upload :action="'http://'+serverIp+':9090/menu/import'" :show-file-list="false" accept="xlsx" :on-success="handelExcelImportSuccess" style="display: inline-block">
             <el-button class="ml-5" type="primary" >导入<i class="el-icon-bottom"/></el-button>
           </el-upload>
           <el-button class="ml-5" type="primary" @click="exp">导出<i class="el-icon-top"/></el-button>
@@ -112,10 +112,13 @@
 </template>
 
 <script>
+import {serverIp} from "../../public/config";
+
 export default {
   name: "User",
   data() {
     return {
+      serverIp:serverIp,
       tableData: [],
       name: "",
       form: {},
@@ -205,7 +208,7 @@ export default {
       }
     },
     exp() {
-      window.open("http://localhost:9090/menu/export")
+      window.open(`http://${serverIp}:9090/menu/export`)
     },
     handelExcelImportSuccess(){
       this.$message.success("导入成功")

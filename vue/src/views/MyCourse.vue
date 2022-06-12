@@ -29,7 +29,7 @@
             <el-button class="ml-5" type="danger" slot="reference" v-if="user.role != 'ROLE_STUDENT'">批量删除<i
                 class="el-icon-remove"/></el-button>
           </el-popconfirm>
-          <el-upload action="http://localhost:9090/course/import" :show-file-list="false" accept="xlsx"
+          <el-upload :action="'http://'+serverIp+':9090/course/import'" :show-file-list="false" accept="xlsx"
                      :on-success="handelExcelImportSuccess" style="display: inline-block">
             <el-button class="ml-5" type="primary" v-if="user.role != 'ROLE_STUDENT'">导入<i class="el-icon-bottom"/>
             </el-button>
@@ -129,10 +129,13 @@
 </template>
 
 <script>
+import {serverIp} from "../../public/config";
+
 export default {
   name: "MyCourse",
   data() {
     return {
+      serverIp:serverIp,
       form: {},
       tableData: [],
       name: '',
@@ -265,7 +268,7 @@ export default {
       this.load()
     },
     exp() {
-      window.open("http://localhost:9090/course/export")
+      window.open(`http://${serverIp}:9090/course/export`)
     },
     handelExcelImportSuccess() {
       this.$message.success("导入成功")

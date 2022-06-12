@@ -13,12 +13,11 @@ import com.yuchao.managementsystem.entity.Files;
 import com.yuchao.managementsystem.entity.User;
 import com.yuchao.managementsystem.mapper.FileMapper;
 import com.yuchao.managementsystem.service.IUserService;
-import org.apache.poi.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -86,7 +85,7 @@ public class EchartsController {
 
     @AuthAccess
     @GetMapping("/file/front/all")
-//    @Cacheable(value = "files",key = "'frontAll'")//不要导错包
+//    @Cacheable(value = "files",key = "'frontAll'")//不要导错包 spring缓存注解
     public Result frontAll() {
         //1.从缓存获取数据
         String jsonStr = stringRedisTemplate.opsForValue().get(Constants.FILES_KEY);

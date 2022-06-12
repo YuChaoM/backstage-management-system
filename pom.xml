@@ -70,17 +70,18 @@
             <artifactId>velocity</artifactId>
             <version>1.7</version>
         </dependency>
-        <!-- 导入导出的依赖-->
+        <!-- 导入导出的依赖 hutool工具库-->
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
             <version>5.7.20</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>4.1.2</version>
-        </dependency>
+        <!--这是一个工具库        -->
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.poi</groupId>-->
+        <!--            <artifactId>poi-ooxml</artifactId>-->
+        <!--            <version>4.1.2</version>-->
+        <!--        </dependency>-->
         <!-- JWT -->
         <dependency>
             <groupId>com.auth0</groupId>
@@ -92,6 +93,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
+        <!-- redis缓存       -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>

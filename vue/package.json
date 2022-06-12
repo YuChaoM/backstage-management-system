@@ -4,14 +4,17 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "report": "vue-cli-service build --report"
   },
   "dependencies": {
     "axios": "^0.26.1",
     "core-js": "^3.6.5",
     "echarts": "^5.3.2",
     "element-ui": "^2.15.6",
+    "mavon-editor": "^2.10.4",
     "vue": "^2.6.11",
+    "vue-meta": "^2.4.0",
     "vue-router": "^3.2.0",
     "vuex": "^3.6.2"
   },

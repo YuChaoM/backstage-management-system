@@ -1,6 +1,7 @@
 package com.yuchao.managementsystem.controller;
 
 import cn.hutool.captcha.CaptchaUtil;
+import cn.hutool.captcha.LineCaptcha;
 import cn.hutool.captcha.ShearCaptcha;
 import cn.hutool.core.lang.ObjectId;
 import cn.hutool.core.util.StrUtil;
@@ -30,7 +31,7 @@ public class CaptchaController {
     private StringRedisTemplate stringRedisTemplate;
 
     @GetMapping("/getkey")
-    public Result getKey(){
+    public Result getKey() {
         //生成唯一的key
         String key = ObjectId.next();
         return Result.success(key);
@@ -50,6 +51,5 @@ public class CaptchaController {
             captcha.write(os);
             os.close();
         }
-//        return Result.success(code);
     }
 }

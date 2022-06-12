@@ -11,7 +11,7 @@
       </el-col>
       <el-col :span="8">
         <div style="margin: 10px 0">
-          <el-upload action="http://localhost:9090/file/upload" :show-file-list="false"
+          <el-upload :action="'http://'+serverIp+':9090/file/uploadFile'" :show-file-list="false"
                      :on-success="handleFileUploadSuccess" style="display: inline-block">
             <el-button type="primary" class="ml-5">上传文件 <i class="el-icon-top"></i></el-button>
           </el-upload>
@@ -86,10 +86,14 @@
 </template>
 
 <script>
+import {serverIp} from "../../public/config";
+import Axios from "axios"
+
 export default {
   name: "File",
   data() {
     return {
+      serverIp: serverIp,
       tableData: [],
       name: '',
       multipleSelection: [],
@@ -97,6 +101,14 @@ export default {
       pageSize: 10,
       total: 0
     }
+  },
+  metaInfo() {
+    return {
+      title: "文件管理",
+      meta: [
+        {name: "referrer", content: "no-referrer"},
+      ],
+    };
   },
   created() {
     this.load()
@@ -166,6 +178,7 @@ export default {
     },
     handleFileUploadSuccess(res) {
       console.log(res)
+      this.$message.success("上传成功")
       this.load()
     },
     download(url) {
@@ -173,7 +186,13 @@ export default {
       window.open(url)
     },
     preview(url) {
-      window.open('https://file.keking.cn/onlinePreview?url=' + encodeURIComponent(window.btoa((url))))
+      // window.open('https://file.keking.cn/onlinePreview?url=' + encodeURIComponent(window.btoa((url))))
+      let path = url.slice(0,26) + url.slice(28)
+      console.log(path)
+      // Axios.post("http://120.25.172.243:5244/api/public/preview", {path: path}).then(res => {
+      //   console.log(res)
+      // })
+      window.open(path)
     },
 
   }
