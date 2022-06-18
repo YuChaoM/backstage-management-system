@@ -1,16 +1,16 @@
 package com.yuchao.managementsystem.controller;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.log.Log;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.yuchao.managementsystem.entity.Files;
-import com.yuchao.managementsystem.entity.User;
+import com.yuchao.managementsystem.common.Result;
+import com.yuchao.managementsystem.entity.Course;
 import com.yuchao.managementsystem.mapper.CourseMapper;
+import com.yuchao.managementsystem.service.ICourseService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
@@ -18,15 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.List;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.yuchao.managementsystem.common.Result;
-
-import com.yuchao.managementsystem.service.ICourseService;
-import com.yuchao.managementsystem.entity.Course;
-
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * <p>
@@ -162,7 +153,6 @@ public class CourseController {
         ExcelReader reader = ExcelUtil.getReader(inputStream);
         // 方式1：(推荐) 通过 javabean的方式读取Excel内的对象，但是要求表头必须是英文，跟javabean的属性要对应起来
         List<Course> list = reader.readAll(Course.class);
-
 
         courseService.saveBatch(list);
         return Result.success(true);

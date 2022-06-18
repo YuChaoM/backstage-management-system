@@ -29,9 +29,9 @@
             <div><b>后端</b></div>
             <div>SpringBoot2</div>
             <div>Hutool</div>
-            <div>Poi</div>
             <div>Lombok</div>
             <div>Mybatis/Mybatis-plus</div>
+            <div>Swagger UI</div>
           </el-col>
           <el-col :span="12" style="line-height: 30px">
             <b>前端</b>
@@ -48,8 +48,9 @@
     <el-row style="margin: 20px 0;">
       <el-col :span="12">
         <div class="m-10" style="margin: 10px 0;">
-          <el-button type="danger"><i class="el-icon-coin"></i><a style="color: #fff" href="http://120.25.172.243">免费开源资料仓库</a></el-button>
+          <el-button type="danger"><i class="el-icon-coin"></i><a style="color: #fff" href="http://120.25.172.243:5244">免费开源资料仓库</a></el-button>
           <el-button type="primary"><i class="el-icon-link"></i> <a style="color: #fff" href="https://gitee.com/meng-yuchao/manage-system">Gitee源码</a></el-button>
+          <el-button type="primary"><i class="el-icon-link"></i> <a style="color: #fff" href="https://github.com/YuChaoM/backstage-management-system">GitHub源码</a></el-button>
 
         </div>
       </el-col>

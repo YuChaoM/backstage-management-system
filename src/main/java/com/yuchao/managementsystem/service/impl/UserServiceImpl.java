@@ -75,15 +75,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         String code = "";
         if (!StrUtil.isBlank(key)) {
             code = stringRedisTemplate.opsForValue().get(key);
-            if (StrUtil.isBlank(code)){
+            if (StrUtil.isBlank(code)) {
                 throw new ServiceException(Constants.CODE_600, "验证码过期，请重新获取");
             }
         }
-        if (StrUtil.isBlank(username) || StrUtil.isBlank(captchaCode)){
-            throw new ServiceException(Constants.CODE_400,"参数错误");
-        }else if (!code.equalsIgnoreCase(captchaCode)){
+        if (StrUtil.isBlank(username) || StrUtil.isBlank(captchaCode)) {
+            throw new ServiceException(Constants.CODE_400, "参数错误");
+        } else if (!code.equalsIgnoreCase(captchaCode)) {
             throw new ServiceException(Constants.CODE_600, "验证码错误");
-        }else {
+        } else {
             User one = (User) getUserInfo(userdto, "login").getData();
             if (one != null) {
                 BeanUtil.copyProperties(one, userdto, true);
@@ -111,15 +111,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         String code = "";
         if (!StrUtil.isBlank(key)) {
             code = stringRedisTemplate.opsForValue().get(key);
-            if (StrUtil.isBlank(code)){
+            if (StrUtil.isBlank(code)) {
                 throw new ServiceException(Constants.CODE_600, "验证码过期，请重新获取");
             }
         }
-        if (StrUtil.isBlank(email) || StrUtil.isBlank(captchaCode)){
-            throw new ServiceException(Constants.CODE_400,"参数错误");
-        }else if (!code.equalsIgnoreCase(captchaCode)){
+        if (StrUtil.isBlank(email) || StrUtil.isBlank(captchaCode)) {
+            throw new ServiceException(Constants.CODE_400, "参数错误");
+        } else if (!code.equalsIgnoreCase(captchaCode)) {
             throw new ServiceException(Constants.CODE_600, "验证码错误");
-        }else {
+        } else {
             User user = (User) getUserInfo(userdto, "register").getData();//先检验数据库没有再存
             if (user == null) {
                 user = new User();
@@ -156,12 +156,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public Result mysaveOrUpdate(User user) {
         UserDTO userDTO = new UserDTO();
-        BeanUtil.copyProperties(user,userDTO,true);
+        BeanUtil.copyProperties(user, userDTO, true);
         Result check = check(userDTO);
-        if(check.getCode() == Constants.CODE_200){
+        if (check.getCode() == Constants.CODE_200) {
             saveOrUpdate(user);
             return Result.success();
-        }else return check;
+        } else return check;
     }
 
     @Override
@@ -177,21 +177,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         String code = "";
         if (!StrUtil.isBlank(key)) {
             code = stringRedisTemplate.opsForValue().get(key);
-            if (StrUtil.isBlank(code)){
+            if (StrUtil.isBlank(code)) {
                 throw new ServiceException(Constants.CODE_600, "验证码过期，请重新获取");
             }
         }
-        if (StrUtil.isBlank(email) || StrUtil.isBlank(captchaCode)){
-            throw new ServiceException(Constants.CODE_400,"参数错误");
-        }else if (!code.equalsIgnoreCase(captchaCode)){
+        if (StrUtil.isBlank(email) || StrUtil.isBlank(captchaCode)) {
+            throw new ServiceException(Constants.CODE_400, "参数错误");
+        } else if (!code.equalsIgnoreCase(captchaCode)) {
             throw new ServiceException(Constants.CODE_600, "验证码错误");
-        }else {
+        } else {
             QueryWrapper<User> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("email", email);
             User one = getOne(queryWrapper);
-            if (one == null){
+            if (one == null) {
                 throw new ServiceException(Constants.CODE_600, "用户不存在");
-            }else {
+            } else {
                 BeanUtil.copyProperties(one, userDTO, true);
                 //设置token
                 String token = TokenUtils.genToken(one.getId().toString(), one.getPassword());
@@ -208,37 +208,37 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public void sendEmailCode(String email, Integer type, String key) throws MessagingException {
-        if (StrUtil.isBlank(email) || StrUtil.isBlank(key)){
+        if (StrUtil.isBlank(email) || StrUtil.isBlank(key)) {
             throw new ServiceException(Constants.CODE_400, "参数异常");
-        }else {
+        } else {
             Date now = new Date();
             String code = RandomUtil.randomNumbers(4); // 随机一个 4位长度的验证码
 
-            //发送登录验证
+            //发送登录验证或者改密验证
             if (ValidationEnum.LOGIN.getType().equals(type)) {
-                SimpleMailMessage message=new SimpleMailMessage();
+                SimpleMailMessage message = new SimpleMailMessage();
                 message.setFrom(from);  // 发送人
                 message.setTo(email);
                 message.setSentDate(now);
                 message.setSubject("【yuc喊你来验证】登录验证");
-                message.setText("您本次登录的验证码是：" + code + "，有效期5分钟。请妥善保管，切勿泄露,如非本人操作请忽略");
+                message.setText("您的验证码是：" + code + "，有效期5分钟。请妥善保管，切勿泄露,如非本人操作请忽略");
                 javaMailSender.send(message);
-            } else if (ValidationEnum.FORGET_PASS.getType().equals(type)){//修改密码验证
+            } else if (ValidationEnum.FORGET_PASS.getType().equals(type)) {//修改密码验证
                 MimeMessage message = javaMailSender.createMimeMessage();
-                MimeMessageHelper helper=new MimeMessageHelper(message);
+                MimeMessageHelper helper = new MimeMessageHelper(message);
                 helper.setFrom(from);  // 发送人
                 helper.setTo(email);
                 helper.setSentDate(now);  // 富文本
                 helper.setSubject("【yuc喊你来验证】忘记密码验证");
-                String context="<b>尊敬的用户：</b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;您好，您本次忘记密码的验证码是："+
-                        "<b color=\"'red'\">"  + code + "</b><br>"
-                        +"，有效期5分钟。请妥善保管，切勿泄露";
+                String context = "<b>尊敬的用户：</b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;您好，您本次忘记密码的验证码是：" +
+                        "<b color=\"'red'\">" + code + "</b><br>"
+                        + "，有效期5分钟。请妥善保管，切勿泄露";
                 helper.setText(context, true);
                 javaMailSender.send(message);
             }
 
             // 发送成功之后，把验证码存到数据库
-            stringRedisTemplate.opsForValue().set(key,code);
+            stringRedisTemplate.opsForValue().set(key, code);
             stringRedisTemplate.expire(key, 5, TimeUnit.MINUTES);
 //            validationService.saveCode(email, code, type, DateUtil.offsetMinute(now, 5));
         }
@@ -257,7 +257,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             if (StrUtil.isBlank(code)) {
                 throw new ServiceException(Constants.CODE_600, "验证码过期，请重新获取");
             }
-        }else {
+        } else {
             throw new ServiceException(Constants.CODE_500, "系统错误");
         }
         if (StrUtil.isBlank(email) || StrUtil.isBlank(captchaCode)) {
@@ -270,7 +270,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             User one = getOne(queryWrapper);
             if (one == null) {
                 throw new ServiceException(Constants.CODE_600, "用户不存在");
-            }else {
+            } else {
                 one.setPassword(newPassword);
                 updateById(one);
             }
@@ -279,9 +279,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public Result getAvatarUrl(Integer type, String temp) {
-        if (type == 1){
+        if (type == 1) {
             return Result.success(userMapper.getAvatarUrlByNanme(temp));
-        }else if (type == 2){
+        } else if (type == 2) {
             return Result.success(userMapper.getAvatarUrlByEmail(temp));
         }
         return Result.error();
@@ -310,14 +310,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
         return Result.success(one);
     }
+
     /**
      * 获取当前角色的菜单列表
-     * @author yuchao
-     * @date 2022/5/1 13:58
+     *
      * @param role
      * @return java.util.List<com.yuchao.managementsystem.entity.Menu>
+     * @author yuchao
+     * @date 2022/5/1 13:58
      */
-    private List<Menu> getRoleMenu(String role){
+    private List<Menu> getRoleMenu(String role) {
         Integer roleId = roleMapper.selectByFlag(role);
         //当前角色可以拥有的菜单
         List<Integer> menuIds = roleMenuMapper.selectByRoleId(roleId);
@@ -327,7 +329,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         for (Menu menu : menus) {
             //筛选当前用户的菜单
-            if (menuIds.contains(menu.getId())){
+            if (menuIds.contains(menu.getId())) {
                 roleMenus.add(menu);
             }
             //当前菜单的子菜单，数据库没有，是在MenuService利用id和pid得到的

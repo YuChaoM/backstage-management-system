@@ -19,7 +19,7 @@
                 <el-input size="medium" style="margin: 10px 0; width: 180px; vertical-align:middle"
                           prefix-icon="el-icon-lock"
                           v-model="user.captchaCode" @keydown.enter.native="login"></el-input>
-                <img :src="captchaUrl" style="padding: 0px 10px 0px 10px; vertical-align:middle" @click="updateCaptcha">
+                <img :src="captchaUrl" style="padding: 0px 5px 0px 10px; vertical-align:middle" @click="updateCaptcha">
               </el-form-item>
               <el-form-item style="margin: 10px 0; text-align: right">
                 <el-button type="warning" size="small" autocomplete="off" @click="$router.push('/register')">注册
@@ -36,7 +36,7 @@
           <div
               style="margin:0px auto; width: 350px; height: 360px;padding: 0px 20px;">
             <el-avatar :src="avatarUrl" :size="70" style="margin:20px 175px 20px 115px "></el-avatar>
-            <el-form :model="user" :rules="rules" ref="userForm">
+            <el-form :model="user">
               <el-form-item prop="email">
                 <el-input size="medium" style="margin: 10px 0" prefix-icon="el-icon-message"
                           v-model="user.email" @blur="getAvatarUrl(2)"></el-input>
@@ -108,7 +108,7 @@ export default {
       rules: {//表单校验规则
         username: [
           {required: true, message: '请输入用户名', trigger: 'blur'},
-          {min: 3, max: 10, message: '长度在 3 到 20 个字符', trigger: 'blur'}
+          {min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur'}
         ],
         password: [
           {required: true, message: '请输入密码', trigger: 'blur'},
@@ -189,7 +189,7 @@ export default {
     },
     login() {
       this.$refs['userForm'].validate((valid) => {//校验不合法时不会发请求
-        console.log(valid) //失效了
+        console.log(valid)
         if (valid) {  // 表单校验合法
           this.request.post("/user/login", this.user).then(res => {
             console.log(res)

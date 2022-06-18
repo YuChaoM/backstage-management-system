@@ -6,7 +6,8 @@ package com.yuchao.managementsystem.common;
  */
 public enum ValidationEnum {
 
-    LOGIN(1),FORGET_PASS(2);
+    LOGIN(1),
+    FORGET_PASS(2);
     private Integer type;
 
     ValidationEnum(Integer type) {

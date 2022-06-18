@@ -20,7 +20,7 @@ services:
     ports:
       - 6379:6379
   mangagesystem:
-    image: mangagesystem:latest
+    image: managementsystem:latest
     build: .
     ports:
       - 9090:9090

@@ -51,7 +51,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         }
         // 执行认证
         if (StrUtil.isBlank(token) || "undefined".equals(token)) {
-            //所有认证不通过，可以把页面转发到登录页
+            //所有认证不通过
             throw new ServiceException(Constants.CODE_401, "无token，请重新登录");
         }
         // 获取 token 中的 user id

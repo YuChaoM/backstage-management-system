@@ -13,9 +13,9 @@
         <el-col :span="6" v-for="item in files" :key="item.id" style="margin-bottom: 10px">
 
           <div style="border: 1px solid #ccc; padding-bottom: 10px">
-            <img :src="item.url" alt="" style="width: 100%">
+            <img :src="item.url" alt="" style="width: 240px;height: 245px">
             <div style="color: #666; padding: 10px">{{ item.name }}</div>
-            <div style="padding: 10px"><el-button type="primary">购买</el-button></div>
+<!--            <div style="padding: 10px"><el-button type="primary">购买</el-button></div>-->
           </div>
         </el-col>
       </el-row>
@@ -30,8 +30,8 @@ export default {
     return {
       //放校园的动态
       imgs: [
-          'https://img30.360buyimg.com/babel/s1580x830_jfs/t1/109361/24/22897/74054/621ede58E099d37e3/f12730c81df6046a.jpg!cc_1580x830.webp',
-          'https://img13.360buyimg.com/babel/s1580x830_jfs/t1/96398/30/23715/70228/6221e9d0Ec1b9fe65/f66e2ad76314d6cd.jpg!cc_1580x830.webp'
+          'https://fastly.jsdelivr.net/gh/YuChaoM/images/OS/image-20220615123448868.png',
+          'https://fastly.jsdelivr.net/gh/YuChaoM/images/OS/login.32c09ed0.jpg'
       ],
       files: []
     }

@@ -6,7 +6,7 @@
         <div style="width: 60px">
           <img src="../../assets/img.png" alt="" style="width: 50px; position: relative; top: 5px; right: 0">
         </div>
-        <div style="flex: 1">欢迎来到xx系统</div>
+        <div style="flex: 1">欢迎来到选课系统</div>
       </div>
       <div style="flex: 1">
         <el-menu :default-active="'1'" class="el-menu-demo" mode="horizontal" router>
@@ -41,10 +41,10 @@
             </div>
             <el-dropdown-menu slot="dropdown" style="width: 100px; text-align: center">
               <el-dropdown-item style="font-size: 14px; padding: 5px 0">
-                <router-link to="/front/password">修改密码</router-link>
+                <router-link to="/password">修改密码</router-link>
               </el-dropdown-item>
               <el-dropdown-item style="font-size: 14px; padding: 5px 0">
-                <router-link to="/front/person">个人信息</router-link>
+                <router-link to="/person">个人信息</router-link>
               </el-dropdown-item>
               <el-dropdown-item style="font-size: 14px; padding: 5px 0">
                 <span style="text-decoration: none" @click="logout">退出</span>
@@ -69,6 +69,14 @@ export default {
     return {
       user: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {}
     }
+  },
+  metaInfo() {
+    return {
+      title: "首页",
+      meta: [
+        {name: "referrer", content: "no-referrer"},
+      ],
+    };
   },
   created() {
 

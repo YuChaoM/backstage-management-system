@@ -23,8 +23,8 @@ public class InterceptorConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**")//拦截所有,静态资源也被拦截了，css样式等
                 //额外放行的，另外一种方法是配置静态资源的访问前缀,这里开放了，不登录的导入和导出功能 "/file/**",
 //                .excludePathPatterns("/user/login", "/user/register","/user/check" ,"/**/export", "/**/import","/file/**",
-                .excludePathPatterns("/user/login", "/user/register", "/user/check","/file/**","/course/export","/course/import","/captcha/**",
-                        "/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**", "/api", "/api-docs", "/api-docs/**")
+                .excludePathPatterns("/user/login", "/user/register", "/user/check","/file/**","/**/export","/**/import","/captcha/**")
+                .excludePathPatterns("/swagger-resources/**","/swagger-ui/**", "/v3/**", "/error")
                 .excludePathPatterns("/**/*.html", "/**/*.js", "/**/*.css", "/**/*.woff", "/**/*.ttf", "/**/*.png", "/**/*.jpg");
 
     }

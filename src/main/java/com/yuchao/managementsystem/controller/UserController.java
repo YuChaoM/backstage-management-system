@@ -48,8 +48,7 @@ public class UserController {
     @Resource
     private IUserService userService;
 
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+
 
     @PostMapping("/login")
     public Result login(@RequestBody UserDTO userDto) {
@@ -97,8 +96,6 @@ public class UserController {
     // 新增或者更新
     @PostMapping
     public Result save(@RequestBody User user) {
-
-//        return userService.mysaveOrUpdate(user);
         userService.saveOrUpdate(user);
         return Result.success();
     }
@@ -113,10 +110,12 @@ public class UserController {
         return Result.success(userService.removeByIds(ids));
     }
 
+
     @GetMapping
     public Result findAll() {
         return Result.success(userService.list());
     }
+
 
     @GetMapping("/role/{role}")
     public Result findUsersByRole(@PathVariable String role) {

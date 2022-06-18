@@ -26,10 +26,10 @@ public class TokenUtils {
     private static IUserService staticUserService;
 
     @Resource//获取bean
-    private  IUserService userService;
+    private IUserService userService;
 
     @PostConstruct//后台启动时就可以赋值
-    public  void setStaticUserService(){
+    public void setStaticUserService() {
         staticUserService = userService;
     }
 

@@ -41,7 +41,7 @@ public class CaptchaController {
     public void getCaptcha(@RequestParam(defaultValue = "") String key, HttpServletResponse response) throws IOException {
         if (!StrUtil.isBlank(key)) {
 //            GifCaptcha captcha = CaptchaUtil.createGifCaptcha(100, 36);
-            ShearCaptcha captcha = CaptchaUtil.createShearCaptcha(100, 36);
+            ShearCaptcha captcha = CaptchaUtil.createShearCaptcha(110, 36);
 //            LineCaptcha captcha = CaptchaUtil.createLineCaptcha(100, 36);
             String code = captcha.getCode();
             ServletOutputStream os = response.getOutputStream();

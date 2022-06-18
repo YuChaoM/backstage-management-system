@@ -9,7 +9,7 @@
                     v-model="user.username" @blur="checkMobile"></el-input>
         </el-form-item>
         <el-form-item prop="email">
-          <el-input placeholder="请输入账号" size="medium" style="margin: 10px 0" prefix-icon="el-icon-message"
+          <el-input placeholder="请输入邮箱" size="medium" style="margin: 10px 0" prefix-icon="el-icon-message"
                     v-model="user.email"></el-input>
         </el-form-item>
         <el-form-item prop="code">
@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import user from "./User";
+
 
 export default {
   name: "Login",

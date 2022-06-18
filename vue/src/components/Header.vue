@@ -24,6 +24,9 @@
         <el-dropdown-item style="font-size: 14px; padding: 5px 0">
           <router-link to="/password" style="text-decoration: none">修改密码</router-link>
         </el-dropdown-item>
+        <el-dropdown-item style="font-size: 14px; padding: 5px 0">
+          <router-link to="/front/home" style="text-decoration: none">返回首页</router-link>
+        </el-dropdown-item>
         <el-dropdown-item style="font-size: 14px; padding: 10px 0">
           <span style="text-decoration: none" @click="logout">退出</span>
         </el-dropdown-item>
@@ -34,7 +37,6 @@
 </template>
 
 <script>
-import user from "../views/User";
 
 export default {
   name: "Header",

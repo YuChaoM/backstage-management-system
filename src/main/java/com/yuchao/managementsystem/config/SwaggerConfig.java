@@ -5,13 +5,12 @@ import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
-
 import springfox.documentation.oas.annotations.EnableOpenApi;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  * @author 蒙宇潮
@@ -19,6 +18,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
  */
 @Configuration
 @EnableOpenApi
+//@EnableSwagger2
 public class SwaggerConfig {
     /**
      * 创建API应用
@@ -30,20 +30,20 @@ public class SwaggerConfig {
      */
     @Bean
     public Docket restApi() {
-        return new Docket(DocumentationType.SWAGGER_2)
+        return new Docket(DocumentationType.OAS_30)
                 .groupName("标准接口")
-                .apiInfo(apiInfo("Spring Boot中使用Swagger2构建RESTful APIs", "1.0"))
+                .apiInfo(apiInfo("Spring Boot中使用Swagger2构建RESTful APIs", "2.0"))
                 .useDefaultResponseMessages(true)
                 .forCodeGeneration(false)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.yuchao.managementsystem.controller"))
+//                .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
                 .paths(PathSelectors.any())
                 .build();
     }
 
     /**
      * 创建该API的基本信息（这些基本信息会展现在文档页面中）
-     * 访问地址：http://ip:port/swagger-ui.html
      *
      * @return
      */
@@ -51,7 +51,7 @@ public class SwaggerConfig {
         return new ApiInfoBuilder()
                 .title(title)
                 .description("更多请关注:120.25.172.243")
-                .termsOfServiceUrl("")
+                .termsOfServiceUrl("http://120.25.172.243")
                 .contact(new Contact("yuchao", "https://", "mengyuchao2001@163.com"))
                 .version(version)
                 .build();
